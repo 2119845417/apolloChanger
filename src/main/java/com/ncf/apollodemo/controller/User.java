@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ncf.apollodemo.demos.web;
+package com.ncf.apollodemo.controller;
 
 /**
  * @author <a href="mailto:chenxilzx1@gmail.com">theonefx</a>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ncf.apollodemo.demos.web;
+package com.ncf.apollodemo.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
