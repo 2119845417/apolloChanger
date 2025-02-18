@@ -7,12 +7,9 @@ import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.NamespaceGrayDelReleaseDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.ctrip.framework.apollo.openapi.dto.OpenReleaseDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @description: 操作apollo配置
@@ -28,19 +25,20 @@ public class ApolloController {
     //apollo中项目id
     private final static String appId = "101";
     //apollo操作用户
-    private final static String opUser = "niucanfei";
+    private final static String opUser = "admin-ncf";
     //apollo中集群名称，apollo默认集群为default
     private final static String cluster = "default";
     //apollo中集群内namespace名称
     private final static String namespace = "application";
- 
+
     //apollo操作客户端
+
     private ApolloOpenApiClient apolloClient;
     public ApolloController(ApolloOpenApiClient client) {
         this.apolloClient = client;
     }
- 
- 
+
+
     /**
      * 获取环境列表，如
      * [{"clusters":["huawei","default"],"env":"PRO"},{"clusters":["default"],"env":"DEV"}]
@@ -51,24 +49,20 @@ public class ApolloController {
     public Object getEnvclusters(@PathVariable String server) {
         return JSON.toJSONString(apolloClient.getEnvClusterInfo(server));
     }
- 
+
     /**
      * 向apollo中新增配置项，为未发布状态。
      * post uri:apollo/dev/add
      * @param env 指定apollo的数据环境
      * @return
      */
-    @PostMapping("/{env}/add}")
-    public Object addParam(@PathVariable String env) {
-        OpenItemDTO openItemDTO = new OpenItemDTO();
-        openItemDTO.setKey("timeout");
-        openItemDTO.setValue("100");
-        openItemDTO.setComment("超时时间");
+    @PostMapping("/{env}/add")
+    public Object addParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
         openItemDTO.setDataChangeCreatedBy(opUser);
         OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
         return JSON.toJSONString(item);
     }
- 
+
     /**
      * 修改apollo中配置项，为未发布状态。
      * post uri:apollo/dev/update
@@ -76,16 +70,12 @@ public class ApolloController {
      * @return
      */
     @PostMapping("/{env}/update")
-    public Object updateParam(@PathVariable String env) {
-        OpenItemDTO openItemDTO = new OpenItemDTO();
-        openItemDTO.setKey("timeout");
-        openItemDTO.setValue("200");
-        openItemDTO.setComment("超时时间");
+    public Object updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
         openItemDTO.setDataChangeCreatedBy(opUser);
         apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
         return JSON.toJSONString(openItemDTO);
     }
- 
+
     /**
      * 获取apollo中namespace的所有配置项
      * @param env 指定apollo的数据环境
@@ -95,8 +85,8 @@ public class ApolloController {
     public Object getAllNameSpace(@PathVariable String env) {
         return JSON.toJSONString(apolloClient.getNamespace(appId, env, cluster, "application"));
     }
- 
- 
+
+
     /**
      * 获取某一项配置
      * @param env 指定apollo的数据环境
@@ -108,7 +98,7 @@ public class ApolloController {
         OpenItemDTO getItem = apolloClient.getItem(appId, env, cluster, namespace, key);
         return JSON.toJSONString(getItem);
     }
- 
+
     /**
      * 刷新发布配置
      *
