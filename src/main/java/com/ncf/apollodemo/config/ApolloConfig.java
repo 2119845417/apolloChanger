@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
  * @date: 2020/7/15 11:27
  */
 @Configuration
-@Profile({"dev","test"}) //运行环境
+//@Profile({"dev","test"}) //运行环境
 public class ApolloConfig {
     /**
      * apollo portal url
