@@ -1,15 +1,15 @@
 package com.ncf.apollodemo.controller;
 
+import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.resp.ResponseResult;
 import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson2.JSON;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
-import com.ctrip.framework.apollo.openapi.dto.NamespaceGrayDelReleaseDTO;
-import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
-import com.ctrip.framework.apollo.openapi.dto.OpenReleaseDTO;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @description: 操作apollo配置
@@ -53,8 +53,15 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/envclusters/{server}")
-    public Object getEnvclusters(@PathVariable String server) {
-        return JSON.toJSONString(apolloClient.getEnvClusterInfo(server));
+    public ResponseResult<List<OpenEnvClusterDTO>> getEnvclusters(@PathVariable String server) {
+        logger.info("getEnvclusters server={}", server);
+        try{
+            List<OpenEnvClusterDTO> envClusterInfo = apolloClient.getEnvClusterInfo(server);
+            return ResponseResult.success(envClusterInfo);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 
     /**
@@ -64,11 +71,16 @@ public class ApolloController {
      * @return
      */
     @PostMapping("/{env}/add")
-    public Object addParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+    public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
         logger.info("addParam openItemDTO:{}", openItemDTO);
         openItemDTO.setDataChangeCreatedBy(opUser);
-        OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
-        return JSON.toJSONString(item);
+        try{
+            OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
+            return ResponseResult.success(item);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 
     /**
@@ -78,11 +90,16 @@ public class ApolloController {
      * @return
      */
     @PostMapping("/{env}/update")
-    public Object updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+    public ResponseResult<Boolean> updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
         logger.info("updateParam openItemDTO:{}", openItemDTO);
         openItemDTO.setDataChangeCreatedBy(opUser);
-        apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
-        return JSON.toJSONString(openItemDTO);
+        try{
+            apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
+            return ResponseResult.success(true);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 
     /**
@@ -96,11 +113,11 @@ public class ApolloController {
         logger.info("removeItem key:{}", key);
         try{
             apolloClient.removeItem(appId, env, cluster, namespace, key, opUser);
+            return ResponseResult.success(true);
         }catch(Exception e){
             logger.error(e.getMessage());
             return ResponseResult.error(500, e.getMessage());
         }
-        return ResponseResult.success(true);
     }
 
     /**
@@ -109,8 +126,15 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/{env}/namespace")
-    public Object getAllNameSpace(@PathVariable String env) {
-        return JSON.toJSONString(apolloClient.getNamespace(appId, env, cluster, "application"));
+    public ResponseResult<OpenNamespaceDTO> getAllNameSpace(@PathVariable String env) {
+        logger.info("getAllNameSpace env:{}", env);
+        try{
+            OpenNamespaceDTO dto = apolloClient.getNamespace(appId, env, cluster, "application");
+            return ResponseResult.success(dto);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 
 
@@ -121,9 +145,15 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/{env}/getParam")
-    public Object getParam(String env,String key) {
-        OpenItemDTO getItem = apolloClient.getItem(appId, env, cluster, namespace, key);
-        return JSON.toJSONString(getItem);
+    public ResponseResult<OpenItemDTO> getParam(String env,String key) {
+        logger.info("getParam key:{}", key);
+        try{
+            OpenItemDTO dto = apolloClient.getItem(appId, env, cluster, namespace, key);
+            return ResponseResult.success(dto);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 
     /**
@@ -132,14 +162,20 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-     public Object releaseParam(String env) {
-        NamespaceGrayDelReleaseDTO namespaceGrayDelReleaseDTO = new NamespaceGrayDelReleaseDTO();
-        //配置版本名称
-        namespaceGrayDelReleaseDTO.setReleaseTitle(System.currentTimeMillis() + "-release");
-        //刷新说明
-        namespaceGrayDelReleaseDTO.setReleaseComment("auto release");
-        namespaceGrayDelReleaseDTO.setReleasedBy(opUser);
-        OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
-        return JSON.toJSONString(openReleaseDTO);
+     public ResponseResult<OpenReleaseDTO> releaseParam(String env) {
+         logger.info("releaseParam env:{}", env);
+         try {
+             NamespaceGrayDelReleaseDTO namespaceGrayDelReleaseDTO = new NamespaceGrayDelReleaseDTO();
+             //配置版本名称
+             namespaceGrayDelReleaseDTO.setReleaseTitle(System.currentTimeMillis() + "-release");
+             //刷新说明
+             namespaceGrayDelReleaseDTO.setReleaseComment("auto release");
+             namespaceGrayDelReleaseDTO.setReleasedBy(opUser);
+             OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
+             return ResponseResult.success(openReleaseDTO);
+         }catch (Exception e) {
+             logger.error(e.getMessage());
+             return ResponseResult.error(500, e.getMessage());
+         }
     }
 }
