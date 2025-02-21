@@ -1,5 +1,7 @@
 package com.ncf.apollodemo.controller;
 
+import com.ncf.apollodemo.resp.ResponseResult;
+import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson2.JSON;
@@ -21,16 +23,19 @@ public class ApolloController {
     private static final Logger logger = LoggerFactory.getLogger(ApolloController.class);
 
     //apollo中项目id
-    private final static String appId = "101";
+    @Value("${appkey.apollo.appId}")
+    private String appId;
     //apollo操作用户
-    private final static String opUser = "admin-ncf";
+    @Value("${appkey.apollo.opUser}")
+    private String opUser;
     //apollo中集群名称，apollo默认集群为default
-    private final static String cluster = "default";
+    @Value("${appkey.apollo.cluster}")
+    private String cluster;
     //apollo中集群内namespace名称
-    private final static String namespace = "application";
+    @Value("${appkey.apollo.namespace}")
+    private String namespace;
 
     //apollo操作客户端
-
     private ApolloOpenApiClient apolloClient;
     public ApolloController(ApolloOpenApiClient client) {
         this.apolloClient = client;
@@ -60,20 +65,12 @@ public class ApolloController {
      */
     @PostMapping("/{env}/add")
     public Object addParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+        logger.info("addParam openItemDTO:{}", openItemDTO);
         openItemDTO.setDataChangeCreatedBy(opUser);
         OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
         return JSON.toJSONString(item);
     }
-//    @PostMapping("/{env}/add")
-//    public Object addParam(@PathVariable String env) {
-//        OpenItemDTO openItemDTO = new OpenItemDTO();
-//        openItemDTO.setKey("testceshi");
-//        openItemDTO.setValue("999999");
-//        openItemDTO.setComment("测试");
-//        openItemDTO.setDataChangeCreatedBy(opUser);
-//        OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
-//            return JSON.toJSONString(item);
-//}
+
     /**
      * 修改apollo中配置项，为未发布状态。
      * post uri:apollo/dev/update
@@ -82,9 +79,28 @@ public class ApolloController {
      */
     @PostMapping("/{env}/update")
     public Object updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+        logger.info("updateParam openItemDTO:{}", openItemDTO);
         openItemDTO.setDataChangeCreatedBy(opUser);
         apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
         return JSON.toJSONString(openItemDTO);
+    }
+
+    /**
+     * 删除apollo中配置项，为未发布状态。
+     * post uri:/LOCAL/removeByKey/{key}
+     * @param env 指定apollo的数据环境
+     * @return
+     */
+    @PostMapping("/{env}/removeByKey/{key}")
+    public ResponseResult<Boolean> removeItem(@PathVariable String env, @PathVariable String key) {
+        logger.info("removeItem key:{}", key);
+        try{
+            apolloClient.removeItem(appId, env, cluster, namespace, key, opUser);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+        return ResponseResult.success(true);
     }
 
     /**
