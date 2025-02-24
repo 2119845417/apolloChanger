@@ -17,16 +17,29 @@
     </properties>
     <dependencies>
 
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-openfeign</artifactId>-->
-<!--        </dependency>-->
-
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!--security-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <!--security-->
+        <!--jwt-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
+        <!--jwt-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
