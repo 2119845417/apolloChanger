@@ -13,8 +13,8 @@ import java.util.List;
 
 /**
  * @description: 操作apollo配置
- * @author: lizz
- * @date: 2020/7/15 11:30
+ * @author: niucanfei
+ * @date: 2025/2/18 11:30
  */
 @RestController
 @RequestMapping(value = "apollo")
