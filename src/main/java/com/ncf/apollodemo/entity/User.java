@@ -1,6 +1,13 @@
 package com.ncf.apollodemo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * User类
@@ -9,17 +16,38 @@ import lombok.Data;
  * leader添加或修改后可直接上线
  */
 @Data
+@TableName(value = "user")
 public class User {
+
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @TableField(value = "user_id")
     private Long userId;
 
+    @TableField(value = "user_name")
     private String userName;
 
+    @TableField(value = "password")
     private String passWord;
 
-    private String email;
+    @TableField(value = "name")
+    private String name;
 
+    @TableField(value = "department")
+    private int department;
+
+    @TableField(value = "phone")
+    private String phone;
+
+    @TableField(value = "is_active")
+    private int isActive;
+
+    @TableField(value = "create_time")
+    private LocalDateTime createTime;
+
+    @TableField(value = "modify_time")
+    private LocalDateTime modifyTime;
     /**
      * 当用户权限为apollo负责人时，会有负责的appId，opsUser，token
      */

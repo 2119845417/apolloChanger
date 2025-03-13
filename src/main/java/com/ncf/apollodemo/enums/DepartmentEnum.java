@@ -1,16 +1,16 @@
 package com.ncf.apollodemo.enums;
 
-public enum RoleEnum {
-    PM(1,"产品"),
+public enum DepartmentEnum {
+    chanpin(1,"产品"),
 
-    CODER(2,"开发者"),
+    kaifa(2,"开发"),
 
-    LEADER(3,"负责人");
+    yewu(3,"业务");
 
     private Integer id;
     private String name;
 
-    RoleEnum(Integer id, String name) {
+    DepartmentEnum(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

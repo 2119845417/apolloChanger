@@ -15,12 +15,25 @@
         <spring-restdocs.version>2.0.6</spring-restdocs.version>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>2.1.4</version>
         </dependency>
+        <!--mybatis-plus-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
+        <!--mysql-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+
         <!--security-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,7 +95,17 @@
             <artifactId>fastjson2</artifactId>
             <version>2.0.53</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.8.22</version>
+        </dependency>
 
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-crypto</artifactId>
+            <version>5.8.22</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
