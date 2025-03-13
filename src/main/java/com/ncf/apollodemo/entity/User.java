@@ -1,9 +1,6 @@
-package com.ncf.apollodemo.dto;
+package com.ncf.apollodemo.entity;
 
 import lombok.Data;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * User类
