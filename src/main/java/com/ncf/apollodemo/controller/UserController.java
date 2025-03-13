@@ -16,11 +16,15 @@
 
 package com.ncf.apollodemo.controller;
 
-import com.ncf.apollodemo.entity.User;
+import com.ncf.apollodemo.pojo.entity.User;
+import com.ncf.apollodemo.pojo.userdo.UserLoginDO;
+import com.ncf.apollodemo.pojo.userdo.UserSignDO;
+import com.ncf.apollodemo.pojo.vo.CreateUserVO;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -36,14 +40,22 @@ public class UserController {
     private UserService userService;
 
     @PostMapping(value = "/user/login")
-    public ResponseResult<String> userLogin(User user) {
+    public ResponseResult<String> userLogin(@RequestBody UserLoginDO userLoginDO) {
         logger.info("登陆");
-        String userName = user.getUserName();
-        String passWord = user.getPassWord();
-        String token = userService.userLogin(userName, passWord);
+        String token = userService.userLogin(userLoginDO);
         if (token.isEmpty()) {
             return ResponseResult.error(500,"登录失败，请检查账号密码是否正确");
         }
         return ResponseResult.success(token);
+    }
+
+    @PostMapping(value = "/user/signIn")
+    public ResponseResult<CreateUserVO> singIn(@RequestBody UserSignDO userSignDO) {
+        logger.info("注册");
+        CreateUserVO user = userService.createUser(userSignDO);
+        if (user == null) {
+            return ResponseResult.error(500,"数据库插入时异常");
+        }
+        return ResponseResult.success(user);
     }
 }

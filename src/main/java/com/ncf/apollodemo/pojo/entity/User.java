@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.entity;
+package com.ncf.apollodemo.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -51,12 +51,12 @@ public class User {
     /**
      * 当用户权限为apollo负责人时，会有负责的appId，opsUser，token
      */
-    private String roles;
-
-    private Integer appId;
-
-    private String apolloOpsUser;
-
-    private String token;
+//    private String roles;
+//
+//    private Integer appId;
+//
+//    private String apolloOpsUser;
+//
+//    private String token;
 }
 

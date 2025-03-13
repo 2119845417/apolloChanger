@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.entity;
+package com.ncf.apollodemo.pojo.entity;
 
 import lombok.Data;
 
