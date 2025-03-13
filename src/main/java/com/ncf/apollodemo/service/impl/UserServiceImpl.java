@@ -47,19 +47,6 @@ public class UserServiceImpl implements UserService {
         return "";
     }
 
-    private Long generateUserId(){
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        List<User> users = userDao.selectList(userQueryWrapper);
-        if(CollectionUtils.isEmpty(users)){
-            return new Long("10001");
-        }
-        Long max = users.get(0).getUserId();
-        for (User user : users) {
-            max = Math.max(max,user.getUserId());
-        }
-        return max+1;
-    }
-
     @Override
     public CreateUserVO createUser(UserSignDO userSignDO) {
         QueryWrapper<User> userName1 = new QueryWrapper<User>().eq("user_name", userSignDO.getUserName());
@@ -101,5 +88,17 @@ public class UserServiceImpl implements UserService {
     public User getOne(QueryWrapper<User> userQueryWrapper) {
         User user = userDao.selectOne(userQueryWrapper);
         return user;
+    }
+    private Long generateUserId(){
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        List<User> users = userDao.selectList(userQueryWrapper);
+        if(CollectionUtils.isEmpty(users)){
+            return new Long("10001");
+        }
+        Long max = users.get(0).getUserId();
+        for (User user : users) {
+            max = Math.max(max,user.getUserId());
+        }
+        return max+1;
     }
 }
