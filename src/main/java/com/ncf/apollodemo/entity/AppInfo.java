@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.dto;
+package com.ncf.apollodemo.entity;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ public class AppInfo {
 
     private Integer appId;
     private String appName;
-    //apollo应用负责人名称
-    private String apolloLeaderName;
+    //apollo应用负责人id
+    private String userOpsId;
 
 }
