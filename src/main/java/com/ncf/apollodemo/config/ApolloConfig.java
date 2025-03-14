@@ -9,8 +9,7 @@ import org.springframework.context.annotation.Profile;
  
 /**
  * @description: apollo openapi连接
- * @author: lizz
- * @date: 2020/7/15 11:27
+ * @author: niucanfei
  */
 @Configuration
 //@Profile({"dev","test"}) //运行环境
