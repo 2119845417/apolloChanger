@@ -16,29 +16,46 @@
 
 package com.ncf.apollodemo.controller;
 
+import com.ncf.apollodemo.pojo.entity.User;
+import com.ncf.apollodemo.pojo.userdo.UserLoginDO;
+import com.ncf.apollodemo.pojo.userdo.UserSignDO;
+import com.ncf.apollodemo.pojo.vo.CreateUserVO;
+import com.ncf.apollodemo.resp.ResponseResult;
+import com.ncf.apollodemo.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author
  */
 @Controller
 public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    // http://127.0.0.1:8080/user/123/roles/222
-    @RequestMapping(value = "/user/{userId}/roles/{roleId}", method = RequestMethod.GET)
-    @ResponseBody
-    public String getLogin(@PathVariable("userId") String userId, @PathVariable("roleId") String roleId) {
-        return "User Id : " + userId + " Role Id : " + roleId;
+    @Autowired
+    private UserService userService;
+
+    @PostMapping(value = "/user/login")
+    public ResponseResult<String> userLogin(@RequestBody UserLoginDO userLoginDO) {
+        logger.info("登陆");
+        String token = userService.userLogin(userLoginDO);
+        if (token.isEmpty()) {
+            return ResponseResult.error(500,"登录失败，请检查账号密码是否正确");
+        }
+        return ResponseResult.success(token);
     }
 
-    // http://127.0.0.1:8080/javabeat/somewords
-    @RequestMapping(value = "/javabeat/{regexp1:[a-z-]+}", method = RequestMethod.GET)
-    @ResponseBody
-    public String getRegExp(@PathVariable("regexp1") String regexp1) {
-        return "URI Part : " + regexp1;
+    @PostMapping(value = "/user/signIn")
+    public ResponseResult<CreateUserVO> singIn(@RequestBody UserSignDO userSignDO) {
+        logger.info("注册");
+        CreateUserVO user = userService.createUser(userSignDO);
+        if (user == null) {
+            return ResponseResult.error(500,"数据库插入时异常");
+        }
+        return ResponseResult.success(user);
     }
 }
