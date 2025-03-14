@@ -77,4 +77,9 @@ public class ApolloServiceImpl implements ApolloService {
         OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
         return openReleaseDTO;
     }
+
+    @Override
+    public List<OpenItemDTO> getOwnerByAppId(Integer appId) {
+        return Collections.emptyList();
+    }
 }

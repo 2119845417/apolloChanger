@@ -21,4 +21,6 @@ public interface ApolloService {
     OpenItemDTO getItem(String env,String key);
 
     OpenReleaseDTO publishNamespace(String env);
+
+    List<OpenItemDTO> getOwnerByAppId(Integer appId);
 }
