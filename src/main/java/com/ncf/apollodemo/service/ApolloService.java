@@ -1,5 +1,6 @@
 package com.ncf.apollodemo.service;
 
+import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.*;
 import org.springframework.stereotype.Service;
 
@@ -21,4 +22,6 @@ public interface ApolloService {
     OpenItemDTO getItem(String env,String key);
 
     OpenReleaseDTO publishNamespace(String env);
+
+    ApolloOpenApiClient getClient(String appId);
 }

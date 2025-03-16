@@ -1,14 +1,19 @@
 package com.ncf.apollodemo.controller;
 
 import com.ctrip.framework.apollo.openapi.dto.*;
+import com.ncf.apollodemo.config.ApolloClientRegistrar;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.service.ApolloService;
+import com.ncf.apollodemo.service.impl.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.alibaba.fastjson2.JSON;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,16 +28,30 @@ import java.util.List;
 //@Profile({"dev","test"}) //内部环境使用
 public class ApolloController {
     private static final Logger logger = LoggerFactory.getLogger(ApolloController.class);
-
+    @Autowired
+    private ApplicationContext context;
     @Autowired
     private ApolloService apolloService;
+    @Autowired
+    private ApolloClientRegistrar beanRegistrar;
+    @Autowired
+    private TokenService tokenService;
 
     //apollo操作客户端
     private ApolloOpenApiClient apolloClient;
-    public ApolloController(ApolloOpenApiClient client) {
-        this.apolloClient = client;
-    }
 
+
+    @PostMapping("/getClient")
+    public ResponseResult<ApolloOpenApiClient> getClient(@RequestParam String appId) {
+        // 检查Bean是否已存在
+        String beanName = "apolloClient_" + appId;
+        if (!context.containsBean(beanName)) {
+            String token = tokenService.getTokenByAppId(appId);
+            beanRegistrar.registerClientBean(appId, token); // 动态注册
+        }
+        ApolloOpenApiClient client = context.getBean(beanName, ApolloOpenApiClient.class);
+        return ResponseResult.success(client);
+    }
 
     @RequestMapping("/hello")
     @ResponseBody
