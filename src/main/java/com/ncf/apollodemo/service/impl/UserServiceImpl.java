@@ -1,17 +1,17 @@
 package com.ncf.apollodemo.service.impl;
 
-import cn.hutool.crypto.asymmetric.KeyType;
-import cn.hutool.crypto.asymmetric.RSA;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ncf.apollodemo.config.SecretConstant;
 import com.ncf.apollodemo.dao.UserDao;
 import com.ncf.apollodemo.pojo.entity.User;
+import com.ncf.apollodemo.pojo.userdo.UserEditInfoDO;
 import com.ncf.apollodemo.pojo.userdo.UserLoginDO;
 import com.ncf.apollodemo.pojo.userdo.UserSignDO;
 import com.ncf.apollodemo.pojo.vo.CreateUserVO;
 import com.ncf.apollodemo.service.UserService;
 import com.ncf.apollodemo.utils.JWTUtils;
 import com.ncf.apollodemo.utils.Md5Utils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Service;
@@ -33,9 +33,6 @@ public class UserServiceImpl implements UserService {
         //创建一个条件构造器
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<User>();
         //传入查询条件
-//        RSA rsa = secretConstant.getRSA();
-//        // 2. 密码加密
-//        String encryptedPwd = rsa.encryptBase64(userLoginDO.getPassWord(), KeyType.PublicKey);
         String encryptedPwd = Md5Utils.code(userLoginDO.getPassWord());
         userQueryWrapper.eq("user_name", userLoginDO.getUserName()).eq("password", encryptedPwd);
 
@@ -55,9 +52,6 @@ public class UserServiceImpl implements UserService {
         if (existUser != null) {
             throw new ApplicationContextException("用户已存在");
         }
-//        RSA rsa = secretConstant.getRSA();
-        // 2. 密码加密
-//        RSA rsa = new RSA(secretConstant.PRIVATE_KEY, secretConstant.PUBLIC_KEY);
         String encryptedPwd = Md5Utils.code(userSignDO.getPassWord());
 
         User newUser = new User();
@@ -73,15 +67,20 @@ public class UserServiceImpl implements UserService {
             QueryWrapper<User> userName2 = new QueryWrapper<User>().eq("userName", userSignDO.getUserName());
             User createUser = getOne(userName2);
             CreateUserVO createUserVO = new CreateUserVO();
-            createUserVO.setId(createUser.getId());
-            createUserVO.setUserId(createUser.getUserId());
-            createUserVO.setUserName(createUser.getUserName());
+            BeanUtils.copyProperties(createUser, createUserVO);
             // 4. 生成脱敏响应
             return createUserVO;
         }else {
             throw new ApplicationContextException("插入数据库失败");
         }
 
+    }
+
+    @Override
+    public User updateUser(UserEditInfoDO userEditInfoDO) {
+        User oldUser = userDao.selectById(userEditInfoDO.getId());
+        //todo
+        return null;
     }
 
     @Override
