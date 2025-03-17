@@ -181,8 +181,8 @@ public class ApolloController {
      * @param key 配置项key
      * @return
      */
-    @GetMapping("/{env}/{appId}/getParam")
-    public ResponseResult<OpenItemDTO> getParam(String env,String key,@PathVariable String appId) {
+    @GetMapping("/{env}/{appId}/getParam/{key}")
+    public ResponseResult<OpenItemDTO> getParam(@PathVariable String env,@PathVariable String key,@PathVariable String appId) {
         logger.info("getParam key:{}", key);
         try{
 //            OpenItemDTO dto = apolloClient.getItem(appId, env, cluster, namespace, key);
