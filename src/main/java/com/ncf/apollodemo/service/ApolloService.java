@@ -24,5 +24,6 @@ public interface ApolloService {
     OpenReleaseDTO publishNamespace(String env,String appId);
 
     ApolloOpenApiClient getClient(String appId);
-    OpenPageDTO<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size);
+
+    List<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size);
 }

@@ -99,10 +99,10 @@ public class ApolloServiceImpl implements ApolloService {
     }
 
     @Override
-    public OpenPageDTO<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size) {
+    public List<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size) {
         ApolloOpenApiClient apolloClient = getClient(appId);
-        apolloClient.findItemsByNamespace(appId,env,cluster,namespace,page,size);
-        return null;
+        OpenNamespaceDTO namespaceDTO = apolloClient.getNamespace(appId, env, cluster, namespace);
+        return namespaceDTO.getItems();
     }
 
 

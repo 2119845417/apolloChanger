@@ -49,10 +49,10 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/{env}/{appId}/getAllKAndV")
-    public ResponseResult<OpenPageDTO<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
+    public ResponseResult<List<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
         logger.info("getAllKeyAndV env:{}", env);
         try {
-            OpenPageDTO<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize());
+            List<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize());
             return ResponseResult.success(openReleaseDTO);
         }catch (Exception e) {
             logger.error(e.getMessage());
