@@ -2,6 +2,7 @@ package com.ncf.apollodemo.controller;
 
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
+import com.ncf.apollodemo.pojo.queryDO.PageQueryDO;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.service.ApolloService;
 import com.ncf.apollodemo.service.impl.TokenService;
@@ -41,6 +42,25 @@ public class ApolloController {
     private ApolloOpenApiClient apolloClient;
 
 
+    /**
+     * 得到某个appID某个环境下所有配置
+     *
+     * @param env 指定apollo的数据环境
+     * @return
+     */
+    @GetMapping("/{env}/{appId}/getAllKAndV")
+    public ResponseResult<OpenPageDTO<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
+        logger.info("getAllKeyAndV env:{}", env);
+        try {
+            OpenPageDTO<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize());
+            return ResponseResult.success(openReleaseDTO);
+        }catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+    }
+
+
     @PostMapping("/getClient")
     public ResponseResult<ApolloOpenApiClient> getClient(@RequestParam String appId) {
         // 检查Bean是否已存在
@@ -64,12 +84,12 @@ public class ApolloController {
      * @param server apollo中服务id
      * @return
      */
-    @GetMapping("/envclusters/{server}")
-    public ResponseResult<List<OpenEnvClusterDTO>> getEnvclusters(@PathVariable String server) {
+    @GetMapping("{appId}/envclusters/{server}")
+    public ResponseResult<List<OpenEnvClusterDTO>> getEnvclusters(@PathVariable String server,@PathVariable String appId) {
         logger.info("getEnvclusters server={}", server);
         try{
 //            List<OpenEnvClusterDTO> envClusterInfo = apolloClient.getEnvClusterInfo(server);
-            List<OpenEnvClusterDTO> envClusterInfo = apolloService.getEnvclusters(server);
+            List<OpenEnvClusterDTO> envClusterInfo = apolloService.getEnvclusters(server,appId);
             return ResponseResult.success(envClusterInfo);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -83,11 +103,11 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-    @PostMapping("/{env}/add")
-    public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+    @PostMapping("/{env}/{appId}/add")
+    public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@PathVariable String appId,@RequestBody OpenItemDTO openItemDTO) {
         logger.info("addParam openItemDTO:{}", openItemDTO);
         try{
-            OpenItemDTO item = apolloService.createItem(env, openItemDTO);
+            OpenItemDTO item = apolloService.createItem(env, openItemDTO,appId);
 //            openItemDTO.setDataChangeCreatedBy(opUser);
 //            OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
             return ResponseResult.success(item);
@@ -103,11 +123,11 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-    @PostMapping("/{env}/update")
-    public ResponseResult<Boolean> updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO) {
+    @PostMapping("/{env}/{appId}/update")
+    public ResponseResult<Boolean> updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO,@PathVariable String appId) {
         logger.info("updateParam openItemDTO:{}", openItemDTO);
         try{
-            apolloService.createOrUpdateItem(env, openItemDTO);
+            apolloService.createOrUpdateItem(env, openItemDTO,appId);
 //            openItemDTO.setDataChangeCreatedBy(opUser);
 //            apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
             return ResponseResult.success(true);
@@ -123,12 +143,12 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-    @PostMapping("/{env}/removeByKey/{key}")
-    public ResponseResult<Boolean> removeItem(@PathVariable String env, @PathVariable String key) {
+    @PostMapping("/{env}/{appId}/removeByKey/{key}")
+    public ResponseResult<Boolean> removeItem(@PathVariable String env, @PathVariable String key,@PathVariable String appId) {
         logger.info("removeItem key:{}", key);
         try{
 //            apolloClient.removeItem(appId, env, cluster, namespace, key, opUser);
-            apolloService.removeItem(env, key);
+            apolloService.removeItem(env, key,appId);
             return ResponseResult.success(true);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -141,11 +161,11 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-    @GetMapping("/{env}/namespace")
-    public ResponseResult<OpenNamespaceDTO> getAllNameSpace(@PathVariable String env) {
+    @GetMapping("/{env}/{appId}/namespace")
+    public ResponseResult<OpenNamespaceDTO> getAllNameSpace(@PathVariable String env,@PathVariable String appId) {
         logger.info("getAllNameSpace env:{}", env);
         try{
-            OpenNamespaceDTO dto = apolloService.getNamespace(env);
+            OpenNamespaceDTO dto = apolloService.getNamespace(env,appId);
 //            OpenNamespaceDTO dto = apolloClient.getNamespace(appId, env, cluster, "application");
             return ResponseResult.success(dto);
         }catch(Exception e){
@@ -161,12 +181,12 @@ public class ApolloController {
      * @param key 配置项key
      * @return
      */
-    @GetMapping("/{env}/getParam")
-    public ResponseResult<OpenItemDTO> getParam(String env,String key) {
+    @GetMapping("/{env}/{appId}/getParam")
+    public ResponseResult<OpenItemDTO> getParam(String env,String key,@PathVariable String appId) {
         logger.info("getParam key:{}", key);
         try{
 //            OpenItemDTO dto = apolloClient.getItem(appId, env, cluster, namespace, key);
-            OpenItemDTO dto = apolloService.getItem(env, key);
+            OpenItemDTO dto = apolloService.getItem(env, key,appId);
             return ResponseResult.success(dto);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -180,7 +200,8 @@ public class ApolloController {
      * @param env 指定apollo的数据环境
      * @return
      */
-     public ResponseResult<OpenReleaseDTO> releaseParam(String env) {
+    @GetMapping("/{env}/{appId}/release")
+     public ResponseResult<OpenReleaseDTO> releaseParam(@PathVariable String env,@PathVariable String appId) {
          logger.info("releaseParam env:{}", env);
          try {
 //             NamespaceGrayDelReleaseDTO namespaceGrayDelReleaseDTO = new NamespaceGrayDelReleaseDTO();
@@ -190,7 +211,7 @@ public class ApolloController {
 //             namespaceGrayDelReleaseDTO.setReleaseComment("auto release");
 //             namespaceGrayDelReleaseDTO.setReleasedBy(opUser);
 //             OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
-             OpenReleaseDTO openReleaseDTO = apolloService.publishNamespace(env);
+             OpenReleaseDTO openReleaseDTO = apolloService.publishNamespace(env,appId);
              return ResponseResult.success(openReleaseDTO);
          }catch (Exception e) {
              logger.error(e.getMessage());

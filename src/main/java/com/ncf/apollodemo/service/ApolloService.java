@@ -9,19 +9,20 @@ import java.util.List;
 
 public interface ApolloService {
 
-    List<OpenEnvClusterDTO> getEnvclusters(String server);
+    List<OpenEnvClusterDTO> getEnvclusters(String server,String appId);
 
-    OpenItemDTO createItem(String env, OpenItemDTO itemDTO);
+    OpenItemDTO createItem(String env, OpenItemDTO itemDTO,String appId);
 
-    void createOrUpdateItem(String env, OpenItemDTO itemDTO);
+    void createOrUpdateItem(String env, OpenItemDTO itemDTO,String appId);
 
-    void removeItem(String env, String key);
+    void removeItem(String env, String key,String appId);
 
-    OpenNamespaceDTO getNamespace(String env);
+    OpenNamespaceDTO getNamespace(String env,String appId);
 
-    OpenItemDTO getItem(String env,String key);
+    OpenItemDTO getItem(String env,String key,String appId);
 
-    OpenReleaseDTO publishNamespace(String env);
+    OpenReleaseDTO publishNamespace(String env,String appId);
 
     ApolloOpenApiClient getClient(String appId);
+    OpenPageDTO<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size);
 }
