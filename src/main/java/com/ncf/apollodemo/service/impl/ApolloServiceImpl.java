@@ -2,9 +2,12 @@ package com.ncf.apollodemo.service.impl;
 
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.*;
+import com.ncf.apollodemo.config.ApolloClientRegistrar;
 import com.ncf.apollodemo.service.ApolloService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -28,6 +31,12 @@ public class ApolloServiceImpl implements ApolloService {
     //apollo操作客户端
     @Autowired
     private ApolloOpenApiClient apolloClient;
+    @Autowired
+    private TokenService tokenService;
+    @Autowired
+    private ApolloClientRegistrar beanRegistrar;
+    @Autowired
+    private ApplicationContext context;
 
 
     @Override
@@ -79,7 +88,14 @@ public class ApolloServiceImpl implements ApolloService {
     }
 
     @Override
-    public List<OpenItemDTO> getOwnerByAppId(Integer appId) {
-        return Collections.emptyList();
+    public ApolloOpenApiClient getClient(String appId) {
+        // 检查Bean是否已存在
+        String beanName = "apolloClient_" + appId;
+        if (!context.containsBean(beanName)) {
+            String token = tokenService.getTokenByAppId(appId);
+            beanRegistrar.registerClientBean(appId, token); // 动态注册
+        }
+        ApolloOpenApiClient client = context.getBean(beanName, ApolloOpenApiClient.class);
+        return client;
     }
 }
