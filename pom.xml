@@ -106,6 +106,13 @@
             <artifactId>hutool-crypto</artifactId>
             <version>5.8.22</version>
         </dependency>
+
+        <!--xxl-job-->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

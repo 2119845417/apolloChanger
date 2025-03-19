@@ -15,9 +15,16 @@ import com.alibaba.fastjson2.JSON;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * @description: 操作apollo配置
@@ -38,8 +45,6 @@ public class ApolloController {
     @Autowired
     private TokenService tokenService;
 
-    //apollo操作客户端
-    private ApolloOpenApiClient apolloClient;
 
 
     /**
@@ -52,7 +57,42 @@ public class ApolloController {
     public ResponseResult<List<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
         logger.info("getAllKeyAndV env:{}", env);
         try {
-            List<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize());
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+            List<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize(),client);
+            return ResponseResult.success(openReleaseDTO);
+        }catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * 非开发者得到某个appID某个环境下有权限的配置
+     *
+     * @param env 指定apollo的数据环境
+     * @return
+     */
+    @GetMapping("/{env}/{appId}/getAuthAllKAndV")
+    public ResponseResult<List<OpenItemDTO>> getAuthAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
+        logger.info("getAllKeyAndV env:{}", env);
+        try {
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+            List<OpenItemDTO> openReleaseDTO = apolloService.getItemsByNamespace(appId,env, pageQueryDO.getPage(), pageQueryDO.getSize(),client);
+            if(!CollectionUtils.isEmpty(openReleaseDTO) && !openReleaseDTO.isEmpty()){
+                //得到以FLAG-开头的配置项 这些配置项是有权限修改的
+                List<OpenItemDTO> filteredItems = Optional.ofNullable(openReleaseDTO)
+                        .orElseGet(Collections::emptyList)
+                        .stream()
+                        .filter(dto -> dto != null && dto.getComment() != null)
+                        .filter(dto -> dto.getComment().startsWith("FLAG-"))
+                        .collect(Collectors.toList());
+                return ResponseResult.success(filteredItems);
+            }
+            //返回空列表
             return ResponseResult.success(openReleaseDTO);
         }catch (Exception e) {
             logger.error(e.getMessage());
@@ -88,8 +128,11 @@ public class ApolloController {
     public ResponseResult<List<OpenEnvClusterDTO>> getEnvclusters(@PathVariable String server,@PathVariable String appId) {
         logger.info("getEnvclusters server={}", server);
         try{
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
 //            List<OpenEnvClusterDTO> envClusterInfo = apolloClient.getEnvClusterInfo(server);
-            List<OpenEnvClusterDTO> envClusterInfo = apolloService.getEnvclusters(server,appId);
+            List<OpenEnvClusterDTO> envClusterInfo = apolloService.getEnvclusters(server,appId,client);
             return ResponseResult.success(envClusterInfo);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -107,7 +150,11 @@ public class ApolloController {
     public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@PathVariable String appId,@RequestBody OpenItemDTO openItemDTO) {
         logger.info("addParam openItemDTO:{}", openItemDTO);
         try{
-            OpenItemDTO item = apolloService.createItem(env, openItemDTO,appId);
+            // 获取拦截器初始化的客户端
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+            OpenItemDTO item = apolloService.createItem(env, openItemDTO,appId,client);
 //            openItemDTO.setDataChangeCreatedBy(opUser);
 //            OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
             return ResponseResult.success(item);
@@ -127,7 +174,10 @@ public class ApolloController {
     public ResponseResult<Boolean> updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO,@PathVariable String appId) {
         logger.info("updateParam openItemDTO:{}", openItemDTO);
         try{
-            apolloService.createOrUpdateItem(env, openItemDTO,appId);
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+            apolloService.createOrUpdateItem(env, openItemDTO,appId,client);
 //            openItemDTO.setDataChangeCreatedBy(opUser);
 //            apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
             return ResponseResult.success(true);
@@ -147,8 +197,11 @@ public class ApolloController {
     public ResponseResult<Boolean> removeItem(@PathVariable String env, @PathVariable String key,@PathVariable String appId) {
         logger.info("removeItem key:{}", key);
         try{
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
 //            apolloClient.removeItem(appId, env, cluster, namespace, key, opUser);
-            apolloService.removeItem(env, key,appId);
+            apolloService.removeItem(env, key,appId,client);
             return ResponseResult.success(true);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -165,7 +218,10 @@ public class ApolloController {
     public ResponseResult<OpenNamespaceDTO> getAllNameSpace(@PathVariable String env,@PathVariable String appId) {
         logger.info("getAllNameSpace env:{}", env);
         try{
-            OpenNamespaceDTO dto = apolloService.getNamespace(env,appId);
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+            OpenNamespaceDTO dto = apolloService.getNamespace(env,appId,client);
 //            OpenNamespaceDTO dto = apolloClient.getNamespace(appId, env, cluster, "application");
             return ResponseResult.success(dto);
         }catch(Exception e){
@@ -185,8 +241,11 @@ public class ApolloController {
     public ResponseResult<OpenItemDTO> getParam(@PathVariable String env,@PathVariable String key,@PathVariable String appId) {
         logger.info("getParam key:{}", key);
         try{
+            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                    .currentRequestAttributes()
+                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
 //            OpenItemDTO dto = apolloClient.getItem(appId, env, cluster, namespace, key);
-            OpenItemDTO dto = apolloService.getItem(env, key,appId);
+            OpenItemDTO dto = apolloService.getItem(env, key,appId,client);
             return ResponseResult.success(dto);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -211,7 +270,10 @@ public class ApolloController {
 //             namespaceGrayDelReleaseDTO.setReleaseComment("auto release");
 //             namespaceGrayDelReleaseDTO.setReleasedBy(opUser);
 //             OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
-             OpenReleaseDTO openReleaseDTO = apolloService.publishNamespace(env,appId);
+             ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                     .currentRequestAttributes()
+                     .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+             OpenReleaseDTO openReleaseDTO = apolloService.publishNamespace(env,appId,client);
              return ResponseResult.success(openReleaseDTO);
          }catch (Exception e) {
              logger.error(e.getMessage());
