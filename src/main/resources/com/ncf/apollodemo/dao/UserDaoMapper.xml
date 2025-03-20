@@ -4,6 +4,5 @@
     <resultMap id="userResultMap" type="com.ncf.apollodemo.pojo.entity.User">
         <result property="id" column="id"/>
         <result property="userName" column="username"/>
-        <result property="roles" column="roles"/>
     </resultMap>
 </mapper>
