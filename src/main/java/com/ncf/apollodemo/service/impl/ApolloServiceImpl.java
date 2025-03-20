@@ -29,8 +29,7 @@ public class ApolloServiceImpl implements ApolloService {
     private String namespace;
 
     //apollo操作客户端
-    @Autowired
-    private ApolloOpenApiClient apolloClient;
+
     @Autowired
     private TokenService tokenService;
     @Autowired
@@ -40,43 +39,55 @@ public class ApolloServiceImpl implements ApolloService {
 
 
     @Override
-    public List<OpenEnvClusterDTO> getEnvclusters(String server) {
+    public List<OpenEnvClusterDTO> getEnvclusters(String server,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
         List<OpenEnvClusterDTO> envClusterInfo = apolloClient.getEnvClusterInfo(server);
         return envClusterInfo;
     }
 
     @Override
-    public OpenItemDTO createItem(String env,OpenItemDTO itemDTO) {
+    public OpenItemDTO createItem(String env,OpenItemDTO itemDTO,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
         itemDTO.setDataChangeCreatedBy(opUser);
         OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, itemDTO);
         return item;
     }
 
     @Override
-    public void createOrUpdateItem(String env, OpenItemDTO itemDTO) {
+    public void createOrUpdateItem(String env, OpenItemDTO itemDTO,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
         itemDTO.setDataChangeCreatedBy(opUser);
         apolloClient.createOrUpdateItem(appId, env, cluster, namespace, itemDTO);
     }
 
     @Override
-    public void removeItem(String env, String key) {
+    public void removeItem(String env, String key,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
         apolloClient.removeItem(appId, env, cluster, namespace, key, opUser);
     }
 
     @Override
-    public OpenNamespaceDTO getNamespace(String env) {
+    public OpenNamespaceDTO getNamespace(String env,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
         OpenNamespaceDTO openNamespaceDTO = apolloClient.getNamespace(appId, env, cluster, namespace);
         return openNamespaceDTO;
     }
 
     @Override
-    public OpenItemDTO getItem(String env, String key) {
+    public OpenItemDTO getItem(String env, String key,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
         OpenItemDTO dto = apolloClient.getItem(appId, env, cluster, namespace, key);
         return dto;
     }
 
     @Override
-    public OpenReleaseDTO publishNamespace(String env) {
+    public OpenReleaseDTO publishNamespace(String env,String appId,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
         NamespaceGrayDelReleaseDTO namespaceGrayDelReleaseDTO = new NamespaceGrayDelReleaseDTO();
         //配置版本名称
         namespaceGrayDelReleaseDTO.setReleaseTitle(System.currentTimeMillis() + "-release");
@@ -86,6 +97,15 @@ public class ApolloServiceImpl implements ApolloService {
         OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
         return openReleaseDTO;
     }
+
+    @Override
+    public List<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size,ApolloOpenApiClient client) {
+        ApolloOpenApiClient apolloClient = client;
+
+        OpenNamespaceDTO namespaceDTO = apolloClient.getNamespace(appId, env, cluster, namespace);
+        return namespaceDTO.getItems();
+    }
+
 
     @Override
     public ApolloOpenApiClient getClient(String appId) {
@@ -98,4 +118,6 @@ public class ApolloServiceImpl implements ApolloService {
         ApolloOpenApiClient client = context.getBean(beanName, ApolloOpenApiClient.class);
         return client;
     }
+
+
 }

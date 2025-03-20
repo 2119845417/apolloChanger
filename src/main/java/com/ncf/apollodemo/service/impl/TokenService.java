@@ -15,7 +15,7 @@ public class TokenService {
     @PostConstruct
     public void init() {
         tokenMap.put("101", "5327be5f5f0603cb432d6c9ee53aa8ec7622a071a62a691a0885ec0d0bea17ea");
-        tokenMap.put("102", "token_102_secret");
+        tokenMap.put("102", "a7027aeb7c7ea66eb8c730bf325068192da237381fe94a5ae7ba95c952f2df1a");
     }
 
     public String getTokenByAppId(String appId) {

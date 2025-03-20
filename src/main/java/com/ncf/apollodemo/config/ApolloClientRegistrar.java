@@ -36,7 +36,7 @@ public class ApolloClientRegistrar  implements BeanDefinitionRegistryPostProcess
 
             BeanDefinition definition = BeanDefinitionBuilder
                     .genericBeanDefinition(ApolloOpenApiClient.class)
-                    .addConstructorArgValue("https://apollo.portal.url")
+                    .addConstructorArgValue("http://localhost:8070/")
                     .addConstructorArgValue(token)
                     .addConstructorArgValue(config) // 明确指定第三个参数
                     .setScope(BeanDefinition.SCOPE_SINGLETON)
