@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         // 3. 保存用户
         int newUserRes = userDao.insert(newUser);
         if(newUserRes > 0){
-            QueryWrapper<User> userName2 = new QueryWrapper<User>().eq("userName", userSignDO.getUserName());
+            QueryWrapper<User> userName2 = new QueryWrapper<User>().eq("user_name", userSignDO.getUserName());
             User createUser = getOne(userName2);
             CreateUserVO createUserVO = new CreateUserVO();
             BeanUtils.copyProperties(createUser, createUserVO);
