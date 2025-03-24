@@ -41,7 +41,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping(value = "/login")
+    @PostMapping("/login")
     public ResponseResult<String> userLogin(@RequestBody UserLoginDO userLoginDO) {
         logger.info("登陆{}", userLoginDO);
         if (userLoginDO == null) {
@@ -57,7 +57,7 @@ public class UserController {
         return ResponseResult.success(token);
     }
 
-    @PostMapping(value = "/signIn")
+    @PostMapping("/signIn")
     public ResponseResult<CreateUserVO> singIn(@RequestBody UserSignDO userSignDO) {
         logger.info("注册{}", userSignDO);
         if (userSignDO == null) {

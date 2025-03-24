@@ -45,8 +45,6 @@ public class ApolloController {
     @Autowired
     private TokenService tokenService;
 
-
-
     /**
      * 得到某个appID某个环境下所有配置
      *
