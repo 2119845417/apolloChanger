@@ -33,7 +33,8 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @author
  */
-@Controller(value = "/user")
+@RestController
+@RequestMapping("/user")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 

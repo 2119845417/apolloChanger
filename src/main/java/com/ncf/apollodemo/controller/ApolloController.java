@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * @date: 2025/2/18 11:30
  */
 @RestController
-@RequestMapping(value = "apollo")
+@RequestMapping("/apollo")
 //@Profile({"dev","test"}) //内部环境使用
 public class ApolloController {
     private static final Logger logger = LoggerFactory.getLogger(ApolloController.class);
