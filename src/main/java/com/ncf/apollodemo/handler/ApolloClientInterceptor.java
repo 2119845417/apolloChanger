@@ -25,25 +25,21 @@ public class ApolloClientInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 1. 路径匹配检查
-        String uri = request.getRequestURI().replaceFirst(request.getContextPath(), "");
-        if (!uri.startsWith("/apollo/")) {
-            return true; // 非Apollo接口跳过
-        }
-
-        // 2. 解析路径变量
+        // 获取路径变量
         Map<String, String> pathVariables = getPathVariables(request);
-        if (pathVariables == null || !pathVariables.containsKey("appId")) {
-            response.sendError(400, "Missing appId in path");
-            return false;
+
+        // 仅当路径变量中存在 appId 时进行处理
+        if (pathVariables != null && pathVariables.containsKey("appId")) {
+            String uri = request.getRequestURI().replaceFirst(request.getContextPath(), "");
+
+            //  验证路径是否以 /apollo/ 开头
+            if (uri.startsWith("/apollo/")) {
+                String appId = pathVariables.get("appId");
+                ApolloOpenApiClient client = getClient(appId);
+                request.setAttribute("apolloClient", client);
+            }
         }
 
-        // 3. 初始化客户端
-        String appId = pathVariables.get("appId");
-        ApolloOpenApiClient client = getClient(appId);
-        
-        // 4. 存储客户端到请求域
-        request.setAttribute("apolloClient", client);
         return true;
     }
 
