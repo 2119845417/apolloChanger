@@ -49,9 +49,13 @@ xxl:
     admin:
       ### 调度中心部署根地址 [选填]：如调度中心集群部署存在多个地址则用逗号分隔。执行器将会使用该地址进行"执行器心跳注册"和"任务结果回调"；为空则关闭自动注册；
       addresses: ${xxl.job.admin.addresses}
+#      XxlJobTemplate相关配置
+      username: ${xxl.job.admin.username}
+      password: ${xxl.job.admin.password}
 #      http://127.0.0.1:9080/xxl-job-admin
     ### 执行器通讯TOKEN [选填]：非空时启用；
     accessToken: ${xxl.job.accessToken}
+
 #    default_token
     executor:
       ### 执行器AppName [选填]：执行器心跳注册分组依据；为空则关闭自动注册
