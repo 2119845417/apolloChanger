@@ -31,36 +31,36 @@ public class ActivityJob {
      * @return
      */
  
-    public void addActivityStatusTask(Activity activity,Integer groupId){//第二个参数为执行器主键ID
-        //获取到各个需要进行状态转换的时间
-        LocalDateTime beginTime = activity.getBeginTime();
-        LocalDateTime endTime = activity.getEndTime();
-        LocalDateTime postTime = activity.getPostTime();
-        LocalDateTime signBeginTime = activity.getSignBeginTime();
-        LocalDateTime signEndTime = activity.getSignEndTime();
-        Long activityId = activity.getId();
- 
-        //生成相应cron表达式
-        String cronToStatusTo1 = generateCron(postTime);
-        String cronToStatusTo2 = generateCron(signBeginTime);
-        String cronToStatusTo3 = generateCron(signEndTime);
-        String cronToStatusTo4 = generateCron(beginTime);
-        String cronToStatusTo5 = generateCron(endTime);
- 
-        //添加任务
-        addJobForActivity(groupId,"活动状态转为1",cronToStatusTo1,"updateActivityStatus",
-                activityId, ActivityConstant.ACTIVITY_PARTICIPATION_STATUS_PARTICIPATED);
-        addJobForActivity(groupId,"活动状态转为2",cronToStatusTo2,"updateActivityStatus",
-                activityId, ActivityConstant.ACTIVITY_STATUS_SIGN_UP);
-        addJobForActivity(groupId,"活动状态转为3",cronToStatusTo3,"updateActivityStatus",
-                activityId, ActivityConstant.ACTIVITY_WAITING_FOR_START);
-        addJobForActivity(groupId,"活动状态转为4",cronToStatusTo4,"updateActivityStatus",
-                activityId, ActivityConstant.ACTIVITY_IN_PROGRESS);
-        addJobForActivity(groupId,"活动状态转为5",cronToStatusTo5,"updateActivityStatus",
-                activityId, ActivityConstant.ACTIVITIES_TO_BE_CERTIFIED);
- 
-        log.info("添加活动状态转换定时任务成功");
-    }
+//    public void addActivityStatusTask(Activity activity,Integer groupId){//第二个参数为执行器主键ID
+//        //获取到各个需要进行状态转换的时间
+//        LocalDateTime beginTime = activity.getBeginTime();
+//        LocalDateTime endTime = activity.getEndTime();
+//        LocalDateTime postTime = activity.getPostTime();
+//        LocalDateTime signBeginTime = activity.getSignBeginTime();
+//        LocalDateTime signEndTime = activity.getSignEndTime();
+//        Long activityId = activity.getId();
+//
+//        //生成相应cron表达式
+//        String cronToStatusTo1 = generateCron(postTime);
+//        String cronToStatusTo2 = generateCron(signBeginTime);
+//        String cronToStatusTo3 = generateCron(signEndTime);
+//        String cronToStatusTo4 = generateCron(beginTime);
+//        String cronToStatusTo5 = generateCron(endTime);
+//
+//        //添加任务
+//        addJobForActivity(groupId,"活动状态转为1",cronToStatusTo1,"updateActivityStatus",
+//                activityId, ActivityConstant.ACTIVITY_PARTICIPATION_STATUS_PARTICIPATED);
+//        addJobForActivity(groupId,"活动状态转为2",cronToStatusTo2,"updateActivityStatus",
+//                activityId, ActivityConstant.ACTIVITY_STATUS_SIGN_UP);
+//        addJobForActivity(groupId,"活动状态转为3",cronToStatusTo3,"updateActivityStatus",
+//                activityId, ActivityConstant.ACTIVITY_WAITING_FOR_START);
+//        addJobForActivity(groupId,"活动状态转为4",cronToStatusTo4,"updateActivityStatus",
+//                activityId, ActivityConstant.ACTIVITY_IN_PROGRESS);
+//        addJobForActivity(groupId,"活动状态转为5",cronToStatusTo5,"updateActivityStatus",
+//                activityId, ActivityConstant.ACTIVITIES_TO_BE_CERTIFIED);
+//
+//        log.info("添加活动状态转换定时任务成功");
+//    }
  
     /**
      * 添加定时任务

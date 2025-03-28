@@ -2,6 +2,7 @@ package com.ncf.apollodemo.controller;
 
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
+import com.ncf.apollodemo.pojo.entity.AddXxlJob;
 import com.ncf.apollodemo.pojo.queryDO.PageQueryDO;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.service.ApolloService;
@@ -277,5 +278,12 @@ public class ApolloController {
              logger.error(e.getMessage());
              return ResponseResult.error(500, e.getMessage());
          }
+    }
+
+    @PostMapping("/{env}/{appId}/setTask")
+    public ResponseResult<Integer> setTask(@PathVariable String env,@PathVariable String appId,@RequestBody AddXxlJob addXxlJob) {
+        logger.info("setTask addXxlJob:{}", addXxlJob);
+        Integer i = apolloService.setTask(addXxlJob);
+
     }
 }

@@ -3,7 +3,9 @@ package com.ncf.apollodemo.service.impl;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
+import com.ncf.apollodemo.pojo.entity.AddXxlJob;
 import com.ncf.apollodemo.service.ApolloService;
+import com.ncf.apollodemo.utils.XxlJobTemplate;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +38,8 @@ public class ApolloServiceImpl implements ApolloService {
     private ApolloClientRegistrar beanRegistrar;
     @Autowired
     private ApplicationContext context;
-
+    @Autowired
+    private XxlJobTemplate xxlJobTemplate;
 
     @Override
     public List<OpenEnvClusterDTO> getEnvclusters(String server,String appId,ApolloOpenApiClient client) {
@@ -104,6 +107,20 @@ public class ApolloServiceImpl implements ApolloService {
 
         OpenNamespaceDTO namespaceDTO = apolloClient.getNamespace(appId, env, cluster, namespace);
         return namespaceDTO.getItems();
+    }
+
+    @Override
+    public Integer setTask(AddXxlJob addXxlJob) {
+        AddXxlJob xxlJob = new AddXxlJob()
+                .setJobGroup(addXxlJob.getJobGroup())
+                .setJobDesc(addXxlJob.getJobDesc())
+                .setAuthor("ApolloChangerTEAM")
+                .setScheduleType("CRON")
+                .setScheduleConf(addXxlJob.getScheduleConf())
+                .setExecutorHandler(addXxlJob.getExecutorHandler())
+                .setExecutorParam(activityId + "," +targetStatus);
+        Integer jobId = xxlJobTemplate.addJob(addXxlJob);
+        return 0;
     }
 
 
