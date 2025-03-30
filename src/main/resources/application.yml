@@ -16,7 +16,7 @@ apollo:
 #配置日志
 mybatis-plus:
   configuration:
-    log-impl: ${mybatis-plus.configuration.log-impl}
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #    org.apache.ibatis.logging.stdout.StdOutImpl
 
 appkey:
@@ -32,17 +32,17 @@ appkey:
 
 spring:
   datasource:
-    url: ${spring.datasource.url}
-#    jdbc:mysql://rm-cn-lf646m6e4001lgo.rwlb.rds.aliyuncs.com:3306/apollochanger?useSSL=true&serverTimezone=Asia/Shanghai
-    username: ${spring.datasource.username}
+    url: jdbc:mysql://rm-cn-lf646m6e4001lgo.rwlb.rds.aliyuncs.com:3306/apollochanger?useSSL=true&serverTimezone=Asia/Shanghai
+    #    jdbc:mysql://rm-cn-lf646m6e4001lgo.rwlb.rds.aliyuncs.com:3306/apollochanger?useSSL=true&serverTimezone=Asia/Shanghai
+    username: apollochanger
 #    apollochanger
-    password: ${spring.datasource.password}
+    password: Nn076076!
 #    Nn076076!
-    driver-class-name: ${spring.datasource.driver-class-name}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 #    com.mysql.cj.jdbc.Driver
   mvc:
     pathmatch:
-      matching-strategy: ${spring.mvc.pathmatch.matching-strategy}
+      matching-strategy: ant_path_matcher
 #      ant_path_matcher
 xxl:
   job:
@@ -71,8 +71,9 @@ xxl:
       logretentiondays: ${xxl.job.executor.logretentiondays}
 #      30
 
-
-
+dingtalk:
+  appKey: "dingrzt0dsutkgggladp"
+  appSecret: "9CD8LNQbFm_RgZeFNPeeysf1LjlqeVcvKrZqvcklU2cPgUr7l7Db71HivF7hlDwH"
 
 
 
