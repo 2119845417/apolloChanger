@@ -262,13 +262,6 @@ public class ApolloController {
      public ResponseResult<OpenReleaseDTO> releaseParam(@PathVariable String env,@PathVariable String appId) {
          logger.info("releaseParam env:{}", env);
          try {
-//             NamespaceGrayDelReleaseDTO namespaceGrayDelReleaseDTO = new NamespaceGrayDelReleaseDTO();
-//             //配置版本名称
-//             namespaceGrayDelReleaseDTO.setReleaseTitle(System.currentTimeMillis() + "-release");
-//             //刷新说明
-//             namespaceGrayDelReleaseDTO.setReleaseComment("auto release");
-//             namespaceGrayDelReleaseDTO.setReleasedBy(opUser);
-//             OpenReleaseDTO openReleaseDTO = apolloClient.publishNamespace(appId, env, cluster, namespace, namespaceGrayDelReleaseDTO);
              ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
                      .currentRequestAttributes()
                      .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
@@ -284,6 +277,6 @@ public class ApolloController {
     public ResponseResult<Integer> setTask(@PathVariable String env,@PathVariable String appId,@RequestBody AddXxlJob addXxlJob) {
         logger.info("setTask addXxlJob:{}", addXxlJob);
         Integer i = apolloService.setTask(addXxlJob);
-
+        return null;
     }
 }

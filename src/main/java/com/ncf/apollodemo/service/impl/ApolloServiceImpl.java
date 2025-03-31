@@ -117,8 +117,8 @@ public class ApolloServiceImpl implements ApolloService {
                 .setAuthor("ApolloChangerTEAM")
                 .setScheduleType("CRON")
                 .setScheduleConf(addXxlJob.getScheduleConf())
-                .setExecutorHandler(addXxlJob.getExecutorHandler())
-                .setExecutorParam(activityId + "," +targetStatus);
+                .setExecutorHandler(addXxlJob.getExecutorHandler());
+//                .setExecutorParam(activityId + "," +targetStatus);
         Integer jobId = xxlJobTemplate.addJob(addXxlJob);
         return 0;
     }

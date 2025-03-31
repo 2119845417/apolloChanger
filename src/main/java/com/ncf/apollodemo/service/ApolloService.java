@@ -29,4 +29,5 @@ public interface ApolloService {
     List<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size,ApolloOpenApiClient client);
 
     Integer setTask(AddXxlJob addXxlJob);
+
 }
