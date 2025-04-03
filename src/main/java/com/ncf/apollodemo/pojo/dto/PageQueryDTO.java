@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.pojo.queryDO;
+package com.ncf.apollodemo.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageQueryDO {
+public class PageQueryDTO {
     private int page;
     private int size;
 }

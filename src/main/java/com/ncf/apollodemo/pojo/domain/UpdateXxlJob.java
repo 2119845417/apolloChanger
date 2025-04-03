@@ -1,14 +1,18 @@
-package com.ncf.apollodemo.pojo.entity;
+package com.ncf.apollodemo.pojo.domain;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
  
 /**
- * 添加Job
+ * 修改Job
  */
 @Data
 @Accessors(chain = true)
-public class AddXxlJob {
+public class UpdateXxlJob {
+    /**
+     * 任务id
+     */
+    private int id;
     /**
      * 执行器主键ID
      */
@@ -34,11 +38,20 @@ public class AddXxlJob {
      */
     private String executorHandler;
     /**
-     * 任务参数
+     * 调度过期策略
+     */
+    private String misfireStrategy;
+    /**
+     * 执行器路由策略
+     */
+    private String executorRouteStrategy;
+    /**
+     * 执行器，任务参数
      */
     private String executorParam;
     /**
-     * // 调度状态：0-停止，1-运行
+     * 阻塞处理策略
      */
-    private int triggerStatus;
+    private String executorBlockStrategy;
+ 
 }

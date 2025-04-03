@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum XxlJobPathEnum {
     LOGIN("/login", "登录"),
     ADD("/jobinfo/add", "添加Job"),
+    STOP("/jobinfo/stop","停止Job"),
     UPDATE("/jobinfo/update", "更新Job"),
     REMOVE("/jobinfo/remove", "删除Job"),
     PAGE_JOB("/jobinfo/pageList", "查询Job"),

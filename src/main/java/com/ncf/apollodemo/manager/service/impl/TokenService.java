@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.service.impl;
+package com.ncf.apollodemo.manager.service.impl;
 
 import org.springframework.stereotype.Service;
 

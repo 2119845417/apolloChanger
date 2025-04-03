@@ -16,18 +16,19 @@
 
 package com.ncf.apollodemo.controller;
 
-import com.ncf.apollodemo.pojo.entity.User;
-import com.ncf.apollodemo.pojo.userdo.UserEditInfoDO;
-import com.ncf.apollodemo.pojo.userdo.UserLoginDO;
-import com.ncf.apollodemo.pojo.userdo.UserSignDO;
+import com.ncf.apollodemo.pojo.domain.User;
+import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
+import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
+import com.ncf.apollodemo.pojo.dto.UserLoginDTO;
+import com.ncf.apollodemo.pojo.dto.UserLoginDTO;
+import com.ncf.apollodemo.pojo.dto.UserSignDTO;
+import com.ncf.apollodemo.pojo.dto.UserSignDTO;
 import com.ncf.apollodemo.pojo.vo.CreateUserVO;
 import com.ncf.apollodemo.resp.ResponseResult;
-import com.ncf.apollodemo.service.UserService;
+import com.ncf.apollodemo.manager.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -42,15 +43,15 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseResult<String> userLogin(@RequestBody UserLoginDO userLoginDO) {
-        logger.info("登陆{}", userLoginDO);
-        if (userLoginDO == null) {
+    public ResponseResult<String> userLogin(@RequestBody UserLoginDTO userLoginDTO) {
+        logger.info("登陆{}", userLoginDTO);
+        if (userLoginDTO == null) {
             return ResponseResult.error(500,"登录失败，参数异常");
         }
-        if(userLoginDO.getUserName() == null || userLoginDO.getPassWord() == null){
+        if(userLoginDTO.getUserName() == null || userLoginDTO.getPassWord() == null){
             return ResponseResult.error(500,"登录失败，账号或密码为空");
         }
-        String token = userService.userLogin(userLoginDO);
+        String token = userService.userLogin(userLoginDTO);
         if (token.isEmpty()) {
             return ResponseResult.error(500,"登录失败，请检查账号密码是否正确");
         }
@@ -58,15 +59,15 @@ public class UserController {
     }
 
     @PostMapping("/signIn")
-    public ResponseResult<CreateUserVO> singIn(@RequestBody UserSignDO userSignDO) {
-        logger.info("注册{}", userSignDO);
-        if (userSignDO == null) {
+    public ResponseResult<CreateUserVO> singIn(@RequestBody UserSignDTO userSignDTO) {
+        logger.info("注册{}", userSignDTO);
+        if (userSignDTO == null) {
             return ResponseResult.error(500,"登录失败，参数异常");
         }
-        if(userSignDO.getUserName() == null || userSignDO.getPassWord() == null || userSignDO.getPhone() == null){
+        if(userSignDTO.getUserName() == null || userSignDTO.getPassWord() == null || userSignDTO.getPhone() == null){
             return ResponseResult.error(500,"登录失败，账号、密码或手机号为空");
         }
-        CreateUserVO user = userService.createUser(userSignDO);
+        CreateUserVO user = userService.createUser(userSignDTO);
         if (user == null) {
             return ResponseResult.error(500,"数据库插入时异常");
         }
@@ -74,12 +75,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/editInfo")
-    public ResponseResult<Boolean> editInfo(@RequestBody UserEditInfoDO userEditInfoDO) {
-        logger.info("修改{}", userEditInfoDO);
-        if (userEditInfoDO == null) {
+    public ResponseResult<Boolean> editInfo(@RequestBody UserEditInfoDTO userEditInfoDTO) {
+        logger.info("修改{}", userEditInfoDTO);
+        if (userEditInfoDTO == null) {
             return ResponseResult.error(500,"修改失败，参数异常");
         }
-        User updateUser = userService.updateUser(userEditInfoDO);
+        User updateUser = userService.updateUser(userEditInfoDTO);
         if (updateUser == null) {
             return ResponseResult.error(500,"更新时出现异常");
         }

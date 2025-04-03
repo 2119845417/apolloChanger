@@ -1,6 +1,5 @@
-package com.ncf.apollodemo.pojo.userdo;
+package com.ncf.apollodemo.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginDO {
+public class UserSignDTO {
+
     private String userName;
+
     private String passWord;
+
+    private String phone;
 }

@@ -1,8 +1,8 @@
 package com.ncf.apollodemo.listener;
 
 import com.dingtalk.open.app.api.callback.OpenDingTalkCallbackListener;
-import com.ncf.apollodemo.dao.model.CardCallbackRequest;
-import com.ncf.apollodemo.dao.model.CardCallbackResponse;
+import com.ncf.apollodemo.pojo.model.CardCallbackRequest;
+import com.ncf.apollodemo.pojo.model.CardCallbackResponse;
 import com.ncf.apollodemo.handler.CustomCallbackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

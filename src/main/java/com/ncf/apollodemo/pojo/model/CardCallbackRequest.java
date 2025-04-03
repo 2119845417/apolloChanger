@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.dao.model;
+package com.ncf.apollodemo.pojo.model;
 
 import java.util.List;
 import java.util.Map;

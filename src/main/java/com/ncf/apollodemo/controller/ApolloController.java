@@ -2,20 +2,17 @@ package com.ncf.apollodemo.controller;
 
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
-import com.ncf.apollodemo.pojo.entity.AddXxlJob;
-import com.ncf.apollodemo.pojo.queryDO.PageQueryDO;
+import com.ncf.apollodemo.pojo.domain.AddXxlJob;
+
+import com.ncf.apollodemo.pojo.dto.PageQueryDTO;
 import com.ncf.apollodemo.resp.ResponseResult;
-import com.ncf.apollodemo.service.ApolloService;
-import com.ncf.apollodemo.service.impl.TokenService;
+import com.ncf.apollodemo.manager.service.ApolloService;
+import com.ncf.apollodemo.manager.service.impl.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.alibaba.fastjson2.JSON;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestAttributes;
@@ -24,7 +21,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -53,7 +49,7 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/{env}/{appId}/getAllKAndV")
-    public ResponseResult<List<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
+    public ResponseResult<List<OpenItemDTO>> getAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDTO pageQueryDO) {
         logger.info("getAllKeyAndV env:{}", env);
         try {
             ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
@@ -74,7 +70,7 @@ public class ApolloController {
      * @return
      */
     @GetMapping("/{env}/{appId}/getAuthAllKAndV")
-    public ResponseResult<List<OpenItemDTO>> getAuthAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDO pageQueryDO) {
+    public ResponseResult<List<OpenItemDTO>> getAuthAllKeyAndV(@PathVariable String env, @PathVariable String appId, @RequestBody PageQueryDTO pageQueryDO) {
         logger.info("getAllKeyAndV env:{}", env);
         try {
             ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
@@ -276,7 +272,12 @@ public class ApolloController {
     @PostMapping("/{env}/{appId}/setTask")
     public ResponseResult<Integer> setTask(@PathVariable String env,@PathVariable String appId,@RequestBody AddXxlJob addXxlJob) {
         logger.info("setTask addXxlJob:{}", addXxlJob);
-        Integer i = apolloService.setTask(addXxlJob);
-        return null;
+        try{
+            Integer i = apolloService.setTask(addXxlJob,env,appId);
+            return ResponseResult.success(i);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
     }
 }

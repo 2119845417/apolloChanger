@@ -7,10 +7,10 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.ncf.apollodemo.enums.XxlJobPathEnum;
-import com.ncf.apollodemo.pojo.entity.AddXxlJob;
-import com.ncf.apollodemo.pojo.entity.UpdateXxlJob;
-import com.ncf.apollodemo.pojo.entity.XxlJobGroup;
-import com.ncf.apollodemo.pojo.entity.XxlJobInfo;
+import com.ncf.apollodemo.pojo.domain.AddXxlJob;
+import com.ncf.apollodemo.pojo.domain.UpdateXxlJob;
+import com.ncf.apollodemo.pojo.domain.XxlJobGroup;
+import com.ncf.apollodemo.pojo.domain.XxlJobInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -147,6 +147,13 @@ public class XxlJobTemplate {
         }
     }
 
+    //停止定时任务
+    public void stopJob(Integer jobId) {
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", jobId);
+        JSONObject result = doRequest(XxlJobPathEnum.STOP, paramMap);
+    }
+
     /**
      * 删除job
      *
@@ -211,5 +218,6 @@ public class XxlJobTemplate {
 
         return result;
     }
+
 
 }

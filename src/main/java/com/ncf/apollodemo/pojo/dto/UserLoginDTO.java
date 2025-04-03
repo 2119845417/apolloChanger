@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.pojo.userdo;
+package com.ncf.apollodemo.pojo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSignDO {
-
+public class UserLoginDTO {
     private String userName;
-
     private String passWord;
-
-    private String phone;
 }

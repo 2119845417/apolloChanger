@@ -1,19 +1,23 @@
-package com.ncf.apollodemo.service.impl;
+package com.ncf.apollodemo.manager.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
-import com.ncf.apollodemo.pojo.entity.AddXxlJob;
-import com.ncf.apollodemo.service.ApolloService;
+import com.ncf.apollodemo.manager.service.ApolloService;
+import com.ncf.apollodemo.pojo.domain.AddXxlJob;
+import com.ncf.apollodemo.utils.CronGenerator;
 import com.ncf.apollodemo.utils.XxlJobTemplate;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import org.springframework.scheduling.support.CronExpression;
 
 @Service
 public class ApolloServiceImpl implements ApolloService {
@@ -29,8 +33,6 @@ public class ApolloServiceImpl implements ApolloService {
     //apollo中集群内namespace名称
     @Value("${appkey.apollo.namespace}")
     private String namespace;
-
-    //apollo操作客户端
 
     @Autowired
     private TokenService tokenService;
@@ -110,17 +112,79 @@ public class ApolloServiceImpl implements ApolloService {
     }
 
     @Override
-    public Integer setTask(AddXxlJob addXxlJob) {
+    public Integer setTask(AddXxlJob addXxlJob,String env,String appId) {
+        // 基础参数校验
+        validateRequiredParams(addXxlJob);
+        String scheduleConf = addXxlJob.getScheduleConf();
+        String cronExpression;
+
+        // 输入为具体时间 → 生成一次性 Cron
+        if (isDateTimeFormat(scheduleConf)) {
+            // 时间参数处理与校验
+            LocalDateTime dateTime = parseAndValidateTime(scheduleConf);
+            cronExpression = CronGenerator.generateCronExpression(dateTime); // 生成仅执行一次的 Cron[1,3](@ref)
+        }
+        // 输入为 Cron → 直接使用
+        else if (isValidCronExpression(scheduleConf)) {
+            cronExpression = scheduleConf;
+        }
+        // 非法输入
+        else {
+            throw new IllegalArgumentException("参数 scheduleConf 必须是有效时间或合法 Cron 表达式");
+        }
+
+        // 构建任务参数
         AddXxlJob xxlJob = new AddXxlJob()
                 .setJobGroup(addXxlJob.getJobGroup())
                 .setJobDesc(addXxlJob.getJobDesc())
                 .setAuthor("ApolloChangerTEAM")
                 .setScheduleType("CRON")
-                .setScheduleConf(addXxlJob.getScheduleConf())
-                .setExecutorHandler(addXxlJob.getExecutorHandler());
-//                .setExecutorParam(activityId + "," +targetStatus);
-        Integer jobId = xxlJobTemplate.addJob(addXxlJob);
-        return 0;
+                .setScheduleConf(cronExpression)
+                .setExecutorHandler(addXxlJob.getExecutorHandler())
+                .setExecutorParam("env=" + env + "&" + "appId=" + appId);
+        return xxlJobTemplate.addJob(xxlJob);
+    }
+
+    private void validateRequiredParams(AddXxlJob job) {
+        if (job.getJobGroup() <= 0) {
+            throw new IllegalArgumentException("任务分组ID非法");
+        }
+        if (StringUtils.isBlank(job.getExecutorHandler())) {
+            throw new IllegalArgumentException("执行器Handler不能为空");
+        }
+        if (StringUtils.isBlank(job.getScheduleConf())) {
+            throw new IllegalArgumentException("调度时间不能为空");
+        }
+    }
+
+    private LocalDateTime parseAndValidateTime(String scheduleConf) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dateTime = LocalDateTime.parse(scheduleConf, formatter);
+            if (dateTime.isBefore(LocalDateTime.now())) {
+                throw new IllegalArgumentException("定时时间不能早于当前时间");
+            }
+            return dateTime;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("时间格式必须为yyyy-MM-dd HH:mm:ss");
+        }
+    }
+
+
+    // 判断是否为有效时间格式（如 "yyyy-MM-dd HH:mm:ss"）
+    private boolean isDateTimeFormat(String scheduleConf) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime.parse(scheduleConf, formatter);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    // 判断是否为合法 Cron 表达式
+    private boolean isValidCronExpression(String scheduleConf) {
+        return CronExpression.isValidExpression(scheduleConf);
     }
 
 

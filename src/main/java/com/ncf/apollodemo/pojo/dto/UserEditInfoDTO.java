@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.pojo.userdo;
+package com.ncf.apollodemo.pojo.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEditInfoDO {
+public class UserEditInfoDTO {
 
     private Long id;
 

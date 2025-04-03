@@ -1,6 +1,6 @@
 package com.ncf.apollodemo.handler;
-import com.ncf.apollodemo.dao.model.CardCallbackRequest;
-import com.ncf.apollodemo.dao.model.CardCallbackResponse;
+import com.ncf.apollodemo.pojo.model.CardCallbackRequest;
+import com.ncf.apollodemo.pojo.model.CardCallbackResponse;
 
 import java.util.Map;
 

@@ -1,9 +1,7 @@
 package com.ncf.apollodemo.utils;
 
-import com.ncf.apollodemo.enums.ActivityConstant;
-import com.ncf.apollodemo.pojo.entity.AddXxlJob;
+import com.ncf.apollodemo.pojo.domain.AddXxlJob;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

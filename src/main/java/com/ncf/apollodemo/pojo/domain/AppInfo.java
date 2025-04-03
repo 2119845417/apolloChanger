@@ -1,4 +1,4 @@
-package com.ncf.apollodemo.pojo.entity;
+package com.ncf.apollodemo.pojo.domain;
 
 import lombok.Data;
 

@@ -1,7 +1,7 @@
 package com.ncf.apollodemo.handler;
 
-import com.ncf.apollodemo.dao.model.CardCallbackRequest;
-import com.ncf.apollodemo.dao.model.CardCallbackResponse;
+import com.ncf.apollodemo.pojo.model.CardCallbackRequest;
+import com.ncf.apollodemo.pojo.model.CardCallbackResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;

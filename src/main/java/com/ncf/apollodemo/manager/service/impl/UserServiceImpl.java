@@ -1,14 +1,17 @@
-package com.ncf.apollodemo.service.impl;
+package com.ncf.apollodemo.manager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ncf.apollodemo.config.SecretConstant;
 import com.ncf.apollodemo.dao.UserDao;
-import com.ncf.apollodemo.pojo.entity.User;
-import com.ncf.apollodemo.pojo.userdo.UserEditInfoDO;
-import com.ncf.apollodemo.pojo.userdo.UserLoginDO;
-import com.ncf.apollodemo.pojo.userdo.UserSignDO;
+import com.ncf.apollodemo.manager.service.UserService;
+import com.ncf.apollodemo.pojo.domain.User;
+import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
+import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
+import com.ncf.apollodemo.pojo.dto.UserLoginDTO;
+import com.ncf.apollodemo.pojo.dto.UserLoginDTO;
+import com.ncf.apollodemo.pojo.dto.UserSignDTO;
+import com.ncf.apollodemo.pojo.dto.UserSignDTO;
 import com.ncf.apollodemo.pojo.vo.CreateUserVO;
-import com.ncf.apollodemo.service.UserService;
 import com.ncf.apollodemo.utils.JWTUtils;
 import com.ncf.apollodemo.utils.Md5Utils;
 import org.springframework.beans.BeanUtils;
@@ -17,7 +20,6 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private SecretConstant secretConstant;
 
     @Override
-    public String userLogin(UserLoginDO userLoginDO) {
+    public String userLogin(UserLoginDTO userLoginDO) {
         //创建一个条件构造器
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<User>();
         //传入查询条件
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CreateUserVO createUser(UserSignDO userSignDO) {
+    public CreateUserVO createUser(UserSignDTO userSignDO) {
         QueryWrapper<User> userName1 = new QueryWrapper<User>().eq("user_name", userSignDO.getUserName());
         User existUser = getOne(userName1);
         // 1. 用户查重
@@ -77,7 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(UserEditInfoDO userEditInfoDO) {
+    public User updateUser(UserEditInfoDTO userEditInfoDO) {
         User oldUser = userDao.selectById(userEditInfoDO.getId());
         //todo
         return null;

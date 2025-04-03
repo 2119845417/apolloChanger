@@ -1,9 +1,8 @@
-package com.ncf.apollodemo.service;
+package com.ncf.apollodemo.manager.service;
 
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.*;
-import com.ncf.apollodemo.pojo.entity.AddXxlJob;
-import org.springframework.stereotype.Service;
+import com.ncf.apollodemo.pojo.domain.AddXxlJob;
 
 import java.util.List;
 
@@ -28,6 +27,6 @@ public interface ApolloService {
 
     List<OpenItemDTO> getItemsByNamespace(String appId, String env,int page, int size,ApolloOpenApiClient client);
 
-    Integer setTask(AddXxlJob addXxlJob);
+    Integer setTask(AddXxlJob addXxlJob,String env,String appId);
 
 }

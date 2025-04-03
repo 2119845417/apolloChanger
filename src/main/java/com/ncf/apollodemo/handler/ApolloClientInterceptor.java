@@ -2,7 +2,7 @@ package com.ncf.apollodemo.handler;
 
 import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
-import com.ncf.apollodemo.service.impl.TokenService;
+import com.ncf.apollodemo.manager.service.impl.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
