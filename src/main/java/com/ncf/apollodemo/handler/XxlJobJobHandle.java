@@ -13,6 +13,7 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -31,8 +32,9 @@ public class XxlJobJobHandle {
     private ApolloService apolloService;
 
 
-//    定时发布配置
+//    用于平台用户定时发布配置
     @XxlJob("scheduledReleaseConf")
+    @ConditionalOnProperty(name = "xxl.job.enabled", havingValue = "true")
     public ReturnT<String> scheduledReleaseConf() {
         log.info("-------apollochanger--定时发布任务--------");
         try {
@@ -58,6 +60,7 @@ public class XxlJobJobHandle {
     }
 
     @XxlJob("deleteExpiredTask")
+    @ConditionalOnProperty(name = "xxl.job.enabled", havingValue = "true")
     public ReturnT<String> deleteExpiredTask() {
         log.info("-------apollochanger--每天0点删除已过期的任务--------");
         try {
