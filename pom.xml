@@ -143,6 +143,12 @@
             <version>1.18.24</version>
             <scope>provided</scope>
         </dependency>
+        <!--openfeign对接第三方API-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <version>3.1.5</version>
+        </dependency>
 
         <!--xxl-job-->
 

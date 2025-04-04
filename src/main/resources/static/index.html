@@ -1,6 +1,1218 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4a6da7;
+            --primary-dark: #3a5d97;
+            --secondary: #6c757d;
+            --dark: #1e1e2d;
+            --darker: #151521;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--dark);
+            color: white;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, var(--darker), var(--dark));
+            color: white;
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .sidebar h2 {
+            padding: 0 15px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .sidebar h2 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        .nav-button {
+            padding: 12px 15px;
+            background: none;
+            border: none;
+            text-align: left;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-button .number {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            margin-right: 10px;
+            transition: var(--transition);
+            font-size: 0.8rem;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-button.active {
+            background-color: rgba(74, 109, 167, 0.2);
+            color: white;
+            border-left: 4px solid var(--primary);
+        }
+
+        .nav-button.active .number {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow: hidden;
+            background-color: #1a1a2e;
+            position: relative;
+        }
+
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(74, 109, 167, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .global-params-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .global-param-card {
+            background: rgba(30, 30, 45, 0.7);
+            padding: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .global-param-card h4 {
+            margin-bottom: 8px;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .global-param-card h4 i {
+            margin-right: 6px;
+            color: var(--primary);
+            font-size: 0.8rem;
+        }
+
+        .global-param-card .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .global-param-card input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .global-param-card input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .copy-btn {
+            padding: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            margin-left: 5px;
+            cursor: pointer;
+            color: white;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .main-panel {
+            display: flex;
+            flex: 1;
+            gap: 15px;
+            overflow: hidden;
+        }
+
+        .module-container {
+            background: rgba(30, 30, 45, 0.7);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .module-header {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(20, 20, 35, 0.5);
+        }
+
+        .module-header h2 {
+            margin-bottom: 8px;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .module-header .endpoint {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: rgba(23, 162, 184, 0.2);
+            border-radius: 4px;
+            font-family: monospace;
+            margin-right: 8px;
+            color: #17a2b8;
+            font-size: 0.8rem;
+        }
+
+        .module-header .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.7rem;
+        }
+
+        .method.get {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+
+        .method.post {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: var(--danger);
+        }
+
+        .module-body {
+            padding: 15px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-family: inherit;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            font-family: 'Consolas', monospace;
+            resize: vertical;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        button i {
+            margin-right: 6px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            /*transform: translateY(-2px);*/
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background-color: var(--secondary);
+        }
+
+        button.secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .response-section {
+            background: rgba(30, 30, 45, 0.7);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background-color: rgba(20, 20, 35, 0.5);
+        }
+
+        .response-header h3 {
+            color: white;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .response-header h3 i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+
+        .response-container {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            overflow: auto;
+            flex: 1;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .highlight {
+            color: #e06c75;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: #2d2d3a;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3);
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 8px 12px;
+            text-decoration: none;
+            display: block;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            word-break: break-all;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .history-btn {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: none;
+            padding: 11px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .history-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-with-history {
+            display: flex;
+            position: relative;
+        }
+
+        .input-with-history input {
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-success {
+            background-color: var(--success);
+            box-shadow: 0 0 5px var(--success);
+        }
+
+        .status-error {
+            background-color: var(--danger);
+            box-shadow: 0 0 5px var(--danger);
+        }
+
+        .status-idle {
+            background-color: var(--secondary);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Loading indicator */
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status text */
+        #status-text {
+            font-size: 0.8rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .global-params-container {
+                flex-wrap: wrap;
+            }
+
+            .global-param-card {
+                flex: 1 0 calc(33.333% - 10px);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-panel {
+                flex-direction: column;
+            }
+
+            .response-section {
+                height: 300px;
+            }
+        }
+
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* For Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
 <body>
-<h1>hello word!!!</h1>
-<p>this is a html page</p>
+<div class="sidebar">
+    <h2><i class="fas fa-code"></i> API Testing</h2>
+    <button class="nav-button active" data-module="get-token">
+        <span class="number">1</span> 获取Token
+    </button>
+    <button class="nav-button" data-module="query-user">
+        <span class="number">2</span> 查询用户
+    </button>
+    <button class="nav-button" data-module="create-group">
+        <span class="number">3</span> 创建群聊
+    </button>
+    <button class="nav-button" data-module="query-group">
+        <span class="number">4</span> 查询群信息
+    </button>
+    <button class="nav-button" data-module="send-group-card">
+        <span class="number">5</span> 发送群卡片
+    </button>
+    <button class="nav-button" data-module="send-private-card">
+        <span class="number">6</span> 发送私聊卡片
+    </button>
+</div>
+
+<div class="main-content">
+    <!-- Global Parameters as Cards -->
+    <div class="global-params-container">
+        <div class="global-param-card">
+            <h4><i class="fas fa-key"></i>  AccessToken(accessToken)</h4>
+            <div class="input-group">
+                <input type="text" id="global-token" placeholder="Access Token 将在获取后自动填充">
+                <button class="copy-btn" onclick="copyToClipboard('global-token')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+        <div class="global-param-card">
+            <h4><i class="fas fa-user"></i> 用户 ID (userId)</h4>
+            <div class="input-group">
+                <input type="text" id="global-userid" placeholder="用户 ID 将在查询后自动填充">
+                <button class="copy-btn" onclick="copyToClipboard('global-userid')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+        <div class="global-param-card">
+            <h4><i class="fas fa-users"></i> 群聊 ID (chatId)</h4>
+            <div class="input-group">
+                <input type="text" id="global-chatid" placeholder="群聊 ID 将在创建后自动填充">
+                <button class="copy-btn" onclick="copyToClipboard('global-chatid')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+        <div class="global-param-card">
+            <h4><i class="fas fa-comments"></i> 会话 ID (openConversationId)</h4>
+            <div class="input-group">
+                <input type="text" id="global-openconversationid" placeholder="会话 ID 将在创建群聊后自动填充">
+                <button class="copy-btn" onclick="copyToClipboard('global-openconversationid')"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Panel with Module and Response -->
+    <div class="main-panel">
+        <div class="module-container">
+            <div id="module-content">
+                <!-- Module content will be loaded here -->
+            </div>
+        </div>
+
+        <div class="response-section">
+            <div class="response-header">
+                <h3><i class="fas fa-reply"></i> 响应结果</h3>
+                <div>
+                    <span id="status-indicator" class="status-indicator status-idle"></span>
+                    <span id="status-text">等待请求</span>
+                </div>
+            </div>
+            <div class="response-container" id="response-output">
+                <!-- API response will be displayed here -->
+                <div class="loading" id="loading-indicator">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Global state
+    const state = {
+        accessToken: '',
+        userId: '',
+        chatId: '',
+        openConversationId: '',
+        chatIdHistory: []
+    };
+
+    // Module definitions
+    const modules = {
+        'get-token': {
+            title: '获取 Access Token',
+            description: '调用接口获取钉钉 Access Token',
+            endpoint: '/api/dingtalk/access-token',
+            method: 'GET',
+            render: function() {
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method get">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <p>点击下方按钮直接调用接口获取 Access Token</p>
+                            <div class="button-container">
+                                <button onclick="callGetToken()"><i class="fas fa-key"></i> 获取 Token</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        },
+        'query-user': {
+            title: '手机号查询用户',
+            description: '通过手机号查询钉钉用户信息',
+            endpoint: '/api/dingtalk/user',
+            method: 'GET',
+            render: function() {
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method get">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <div class="form-group">
+                                <label for="mobile">手机号:</label>
+                                <input type="text" id="mobile" placeholder="输入手机号" oninput="formatMobile(this)">
+                            </div>
+                            <div class="button-container">
+                                <button onclick="queryUser()"><i class="fas fa-search"></i> 查询用户</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        },
+        'create-group': {
+            title: '创建群聊',
+            description: '创建钉钉群聊',
+            endpoint: '/api/dingtalk/chat-group',
+            method: 'POST',
+            render: function() {
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method post">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <div class="form-group">
+                                <label for="group-name">群名称:</label>
+                                <input type="text" id="group-name" placeholder="输入群名称" value="测试群">
+                            </div>
+                            <div class="form-group">
+                                <label for="group-owner">群主 ID:</label>
+                                <input type="text" id="group-owner" placeholder="输入群主 ID" value="${state.userId}">
+                            </div>
+                            <div class="form-group">
+                                <label for="group-members">成员 ID 列表 (每行一个):</label>
+                                <textarea id="group-members" placeholder="输入成员 ID，每行一个">${state.userId}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="group-settings">群设置:(测试时不要修改下方值，含义参考后端代码)</label>
+                                <textarea id="group-settings" placeholder="群设置 JSON">{
+  "showHistoryType": 1,
+  "searchable": 0,
+  "validationType": 0,
+  "mentionAllAuthority": 0,
+  "managementType": 0,
+  "chatBannedType": 0
+}</textarea>
+                            </div>
+                            <div class="button-container">
+                                <button onclick="createGroup()"><i class="fas fa-users"></i> 创建群聊</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        },
+        'query-group': {
+            title: '查询群信息',
+            description: '查询钉钉群聊信息',
+            endpoint: '/api/dingtalk/chat-group/{chatId}',
+            method: 'GET',
+            render: function() {
+                let historyOptions = '';
+                state.chatIdHistory.forEach(id => {
+                    historyOptions += `<a href="#" onclick="setChatId('${id}'); return false;">${id}</a>`;
+                });
+
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method get">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <div class="form-group">
+                                <label for="query-chatid">群聊 ID:</label>
+                                <div class="input-with-history">
+                                    <input type="text" id="query-chatid" placeholder="输入群聊 ID" value="${state.chatId}">
+                                    <div class="dropdown" id="history-dropdown">
+                                        <button class="history-btn" onclick="toggleHistoryDropdown(event)"><i class="fas fa-history"></i></button>
+                                        <div class="dropdown-content">
+                                            ${historyOptions || '<a href="#">暂无历史记录</a>'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-container">
+                                <button onclick="queryGroup()"><i class="fas fa-info-circle"></i> 查询群信息</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        },
+        'send-group-card': {
+            title: '发送群卡片',
+            description: '向钉钉群聊发送卡片消息(必须在该群聊中添加ApplloChanger机器人)',
+            endpoint: '/api/dingtalk/group-card',
+            method: 'POST',
+            render: function() {
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method post">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <div class="form-group">
+                                <label for="group-card-openconversationid">
+                                    会话 ID (openConversationId):
+                                </label>
+                                <input type="text" id="group-card-openconversationid" placeholder="输入会话 ID" value="${state.openConversationId}">
+                            </div>
+                            <div class="button-container">
+                                <button onclick="sendGroupCard()"><i class="fas fa-paper-plane"></i> 发送群卡片</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        },
+        'send-private-card': {
+            title: '发送私聊卡片',
+            description: '向钉钉用户发送私聊卡片消息',
+            endpoint: '/api/dingtalk/private-card',
+            method: 'POST',
+            render: function() {
+                return `
+                        <div class="module-header">
+                            <h2>${this.title}</h2>
+                            <span class="endpoint">${this.endpoint}</span>
+                            <span class="method post">${this.method}</span>
+                            <p>${this.description}</p>
+                        </div>
+                        <div class="module-body">
+                            <div class="form-group">
+                                <label for="private-card-userid">会话 ID (userId):</label>
+                                <input type="text" id="private-card-userid" placeholder="输入用户 ID" value="${state.userId}">
+                            </div>
+                            <div class="button-container">
+                                <button onclick="sendPrivateCard()"><i class="fas fa-paper-plane"></i> 发送私聊卡片</button>
+                            </div>
+                        </div>
+                    `;
+            }
+        }
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set active module
+        loadModule('get-token');
+
+        // Add event listeners to navigation buttons
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                loadModule(this.dataset.module);
+            });
+        });
+    });
+
+    // Load module content
+    function loadModule(moduleId) {
+        const moduleContent = document.getElementById('module-content');
+        moduleContent.innerHTML = modules[moduleId].render();
+    }
+
+    // Format mobile input to remove non-digit characters
+    function formatMobile(input) {
+        input.value = input.value.replace(/\D/g, '');
+    }
+
+    // Copy to clipboard function
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element || !element.nextElementSibling) return;
+
+        element.select();
+        document.execCommand('copy');
+
+        // Show feedback
+        const originalText = element.nextElementSibling.innerHTML;
+        element.nextElementSibling.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+            element.nextElementSibling.innerHTML = originalText;
+        }, 1500);
+    }
+
+    // Toggle history dropdown
+    function toggleHistoryDropdown(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const dropdown = document.getElementById('history-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('active');
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }
+    }
+
+    // Set chat ID from history
+    function setChatId(id) {
+        const inputElement = document.getElementById('query-chatid');
+        if (inputElement) {
+            inputElement.value = id;
+            state.chatId = id;
+
+            const globalChatIdElement = document.getElementById('global-chatid');
+            if (globalChatIdElement) {
+                globalChatIdElement.value = id;
+            }
+
+            // Close dropdown after selection
+            const dropdown = document.getElementById('history-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('active');
+            }
+        }
+    }
+
+    // Update global state
+    function updateState(key, value) {
+        state[key] = value;
+
+        // Update UI
+        if (key === 'accessToken') {
+            const element = document.getElementById('global-token');
+            if (element) element.value = value;
+        } else if (key === 'userId') {
+            const element = document.getElementById('global-userid');
+            if (element) element.value = value;
+        } else if (key === 'chatId') {
+            const element = document.getElementById('global-chatid');
+            if (element) element.value = value;
+
+            // Add to history if not already present
+            if (!state.chatIdHistory.includes(value)) {
+                state.chatIdHistory.unshift(value);
+                // Keep only the last 5 items
+                if (state.chatIdHistory.length > 5) {
+                    state.chatIdHistory.pop();
+                }
+            }
+        } else if (key === 'openConversationId') {
+            const element = document.getElementById('global-openconversationid');
+            if (element) element.value = value;
+        }
+    }
+
+    // Update status indicator
+    function updateStatus(status, message) {
+        const indicator = document.getElementById('status-indicator');
+        const text = document.getElementById('status-text');
+
+        if (!indicator || !text) return;
+
+        indicator.className = 'status-indicator';
+        if (status === 'success') {
+            indicator.classList.add('status-success');
+            text.textContent = message || '请求成功';
+        } else if (status === 'error') {
+            indicator.classList.add('status-error');
+            text.textContent = message || '请求失败';
+        } else {
+            indicator.classList.add('status-idle');
+            text.textContent = message || '等待请求';
+        }
+    }
+
+    // Show/hide loading indicator
+    function toggleLoading(show) {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = show ? 'flex' : 'none';
+        }
+    }
+
+    // Display response
+    function displayResponse(response) {
+        const responseOutput = document.getElementById('response-output');
+        if (!responseOutput) return;
+
+        // Format JSON with syntax highlighting
+        let formattedJson = JSON.stringify(response, null, 2);
+
+        // Highlight key fields
+        formattedJson = formattedJson.replace(/"access_token":\s*"([^"]+)"/g, '"access_token": "<span class="highlight">$1</span>"');
+        formattedJson = formattedJson.replace(/"userid":\s*"([^"]+)"/g, '"userid": "<span class="highlight">$1</span>"');
+        formattedJson = formattedJson.replace(/"chatid":\s*"([^"]+)"/g, '"chatid": "<span class="highlight">$1</span>"');
+        formattedJson = formattedJson.replace(/"openConversationId":\s*"([^"]+)"/g, '"openConversationId": "<span class="highlight">$1</span>"');
+
+        responseOutput.innerHTML = formattedJson;
+    }
+
+    // API call functions
+    async function callApi(endpoint, method, params = null, body = null) {
+        try {
+            updateStatus('idle', '正在发送请求...');
+            toggleLoading(true);
+
+            const currentPort = window.location.port || '8080'; // 默认端口
+            let url = `http://localhost:${currentPort}${endpoint}`;
+
+            // Add query parameters
+            if (params) {
+                const queryParams = new URLSearchParams();
+                for (const key in params) {
+                    if (params[key]) {
+                        queryParams.append(key, params[key]);
+                    }
+                }
+                url += `?${queryParams.toString()}`;
+            }
+
+            // Prepare request options
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            // Add request body for POST requests
+            if (method === 'POST' && body) {
+                options.body = JSON.stringify(body);
+            }
+
+            // Make the request
+            const response = await fetch(url, options);
+            const data = await response.json();
+
+            // Display response
+            displayResponse(data);
+
+            // Update status
+            if (data.code === 200) {
+                updateStatus('success', '请求成功');
+
+                // Extract and update global parameters based on the endpoint
+                if (endpoint === '/api/dingtalk/access-token' && data.data && data.data.access_token) {
+                    updateState('accessToken', data.data.access_token);
+                } else if (endpoint === '/api/dingtalk/user' && data.data && data.data.userid) {
+                    updateState('userId', data.data.userid);
+                } else if (endpoint.includes('/api/dingtalk/chat-group')) {
+                    if (data.data) {
+                        if (data.data.chatid) {
+                            updateState('chatId', data.data.chatid);
+                        }
+                        if (data.data.openConversationId) {
+                            updateState('openConversationId', data.data.openConversationId);
+                        }
+                    }
+                }
+            } else {
+                updateStatus('error', `错误: ${data.msg || '未知错误'}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('API call error:', error);
+            displayResponse({ error: error.message });
+            updateStatus('error', `错误: ${error.message}`);
+            return null;
+        } finally {
+            toggleLoading(false);
+        }
+    }
+
+    // Simplify the API-specific functions since parameter extraction is now handled in callApi
+    async function callGetToken() {
+        await callApi('/api/dingtalk/access-token', 'GET');
+    }
+
+    async function queryUser() {
+        const mobile = document.getElementById('mobile').value;
+        if (!mobile) {
+            alert('请输入手机号');
+            return;
+        }
+
+        const accessToken = state.accessToken || document.getElementById('global-token').value;
+        if (!accessToken) {
+            alert('请先获取 Access Token');
+            return;
+        }
+
+        await callApi('/api/dingtalk/user', 'GET', { accessToken, mobile });
+    }
+
+    async function createGroup() {
+        const accessToken = state.accessToken || document.getElementById('global-token').value;
+        if (!accessToken) {
+            alert('请先获取 Access Token');
+            return;
+        }
+
+        const name = document.getElementById('group-name').value;
+        const owner = document.getElementById('group-owner').value;
+        const membersText = document.getElementById('group-members').value;
+        const settingsText = document.getElementById('group-settings').value;
+
+        if (!name || !owner || !membersText) {
+            alert('请填写必要的群聊信息');
+            return;
+        }
+
+        // Parse members (one per line)
+        const useridlist = membersText.split('\n').map(id => id.trim()).filter(id => id);
+
+        // Parse settings
+        let settings = {};
+        try {
+            settings = JSON.parse(settingsText);
+        } catch (e) {
+            alert('群设置 JSON 格式错误');
+            return;
+        }
+
+        // Prepare request body
+        const requestBody = {
+            name,
+            owner,
+            useridlist,
+            ...settings
+        };
+
+        await callApi('/api/dingtalk/chat-group', 'POST', { accessToken }, requestBody);
+    }
+
+    async function queryGroup() {
+        const accessToken = state.accessToken || document.getElementById('global-token').value;
+        if (!accessToken) {
+            alert('请先获取 Access Token');
+            return;
+        }
+
+        const chatId = document.getElementById('query-chatid').value;
+        if (!chatId) {
+            alert('请输入群聊 ID');
+            return;
+        }
+
+        await callApi(`/api/dingtalk/chat-group/${chatId}`, 'GET', { accessToken });
+    }
+
+    async function sendGroupCard() {
+        const accessToken = state.accessToken || document.getElementById('global-token').value;
+        if (!accessToken) {
+            alert('请先获取 Access Token');
+            return;
+        }
+
+        const openConversationId = document.getElementById('group-card-openconversationid').value || state.openConversationId;
+        if (!openConversationId) {
+            alert('请输入会话 ID (openConversationId)');
+            return;
+        }
+
+        // Send only accessToken and openConversationId as query parameters
+        await callApi('/api/dingtalk/group-card', 'POST', { accessToken, openConversationId });
+    }
+
+    async function sendPrivateCard() {
+        const accessToken = state.accessToken || document.getElementById('global-token').value;
+        if (!accessToken) {
+            alert('请先获取 Access Token');
+            return;
+        }
+
+        const userid = document.getElementById('private-card-userid').value || state.userId;
+        if (!userid) {
+            alert('请输入用户 ID');
+            return;
+        }
+
+        // Send only accessToken and userid as query parameters
+        await callApi('/api/dingtalk/private-card', 'POST', { accessToken, userid });
+    }
+</script>
 </body>
 </html>
+

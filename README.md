@@ -19,27 +19,80 @@ ApolloChanger是企业内部给非技术人员使用的配置管理工具，使�
 2. 创建企业内部应用：
 3. 记录以下关键信息：
    ```ini
-   AppKey = "your_app_key"
-   AppSecret = "your_app_secret"
+   dingtalk.appKey = "your_app_key"
+   dingtalk.appSecret = "your_app_secret"
 4. 创建卡片模板
-5. 实例化卡片（内测中）
+5. 实例化卡片（参考钉钉三方API调用模块）
 6. 启用"卡片回调"权限
 7. 运行项目监听&回调
 
 ### 关于钉钉回调模块的项目结构
-    src/main/java/com.ncf.apollodemo
+    src/main/java/com/ncf/apolldemo
     ├── config               # 钉钉配置类
     │   └── DingTalkConfig.java
-    ├── listener             # 回调监听处理
-    │   ├── DingTalkCallbackListener.java
+    ├── handler              # 回调处理器类
     │   ├── DefaultCallbackHandler.java
     │   └── CustomCallbackHandler.java
-    ├── dao/model                # 数据模型
-    │   ├── CardCallbackRequest.java
-    │   └── CardCallbackResponse.java
+    ├── listener             # 回调监听器
+    │   └── DingTalkCallbackListener.java
+    ├── pojo
+    │   └── model
+    │       ├── request      # 请求相关的模型
+    │       │   └── CardCallbackRequest.java
+    │       └── response     # 响应相关的模型
+    │           └── CardCallbackResponse.java
     └── ....(其余功能代码)
 
 ### 启动监听长连接
 1. 在主启动类中完成钉钉长连接的初始化
     ```ini
     context.getBean(DingTalkConfig.class).initDingTalkConnection();
+   
+## 钉钉三方API调用模块
+
+### 应用配置
+1. 配置项
+   ```ini
+   dingtalk.cardTemplateId = "your_cardTemplateId"
+   dingtalk.callbackType = "STREAM"
+   dingtalk.robotCode = "your_robotCode"
+   
+2. 权限要求
+   - 根据手机号获取成员基本信息权限
+   - 钉钉群基础信息管理权限
+   - 钉钉群基础信息读权限
+   - 互动卡片实例写权限
+### 相关接口使用方法
+   - 相关接口使用方法可参考项目index页面，具体分为六部分这里不再过多赘述
+   ![img.png](img.png)
+
+### 关于钉钉API调用模块的项目结构
+      src/main/java/com/ncf/apolldemo
+      ├── controller               # 控制器层
+      │   └── DingTalkController.java （仅建议DEV环境测试使用）
+      ├── service                  # 服务层接口
+      │   └── DingTalkService.java
+      ├── service/impl             # 服务层实现
+      │   └── DingTalkServiceImpl.java
+      ├── feign                    # Feign 客户端
+      │   ├── DingTalkClient.java
+      │   └── InitCardInstanceClient.java
+      ├── pojo/model               # 数据模型
+      │   ├── request              # 请求相关的模型
+      │   │   ├── DingTalkCreateChatRequest.java
+      │   │   └── initcard
+      │   │       ├── BaseDingTalkInitCardRequest.java
+      │   │       ├── GroupCardInitRequest.java
+      │   │       └── PrivateCardInitRequest.java
+      │   └── response             # 响应相关的模型
+      │       ├── AccessTokenResponse.java
+      │       ├── CardInstanceResponse.java
+      │       ├── DingTalkCreateChatResponse.java
+      │       ├── DingTalkGetChatResponse.java
+      │       └── DingTalkUserResponse.java
+      └── ....(其余功能代码)
+      ......
+      └── resources
+          └── static
+              └── index.html  接口测试页面（DEV用）
+
