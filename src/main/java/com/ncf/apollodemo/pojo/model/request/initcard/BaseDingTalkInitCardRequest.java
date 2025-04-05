@@ -1,5 +1,6 @@
 package com.ncf.apollodemo.pojo.model.request.initcard;
 
+import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import lombok.Data;
 
 @Data
@@ -26,6 +27,11 @@ public  class BaseDingTalkInitCardRequest {
         private String title;
         private String type;
         private String reason;
+        private String appid;
+        private String key;
+        private String value;
+        private String itemType;
+        private String comment;
         private String lastMessage;
         private String status;
     }

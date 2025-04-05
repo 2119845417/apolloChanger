@@ -84,7 +84,7 @@ xxl:
 dingtalk:
   appKey: "dingrzt0dsutkgggladp"
   appSecret: "9CD8LNQbFm_RgZeFNPeeysf1LjlqeVcvKrZqvcklU2cPgUr7l7Db71HivF7hlDwH"
-  cardTemplateId: "3b052083-d23e-493c-bbd5-f000a46fe668.schema"
+  cardTemplateId: "0b7a7782-fd54-4d61-b33a-43524accbdf2.schema"
   callbackType: "STREAM"
   robotCode: "dingrzt0dsutkgggladp"
 

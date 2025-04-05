@@ -36,6 +36,11 @@ public class DefaultCallbackHandler implements CustomCallbackHandler {
 
         // 根据按钮动作处理回调逻辑
         String newStatus = handleCallbackLogic(params);
+
+        switch (newStatus){
+            case AGREE_ACTION:
+            case REGECT_ACTION:
+        }
         // 构造响应对象
         CardCallbackResponse response = new CardCallbackResponse();
         response.setCardData(updateCardData(newStatus));//你可以自定义响应内容

@@ -1,9 +1,10 @@
 package com.ncf.apollodemo.controller;
 
-import com.ncf.apollodemo.dingtalkservice.DingTalkService;
+import com.ncf.apollodemo.manager.service.DingTalkService;
 import com.ncf.apollodemo.pojo.model.request.DingTalkCreateChatRequest;
 import com.ncf.apollodemo.pojo.model.request.initcard.GroupCardInitRequest;
 import com.ncf.apollodemo.pojo.model.request.initcard.PrivateCardInitRequest;
+import com.ncf.apollodemo.pojo.model.response.*;
 import com.ncf.apollodemo.resp.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,45 +21,46 @@ public class DingTalkController {
 
     // 获取访问令牌
     @GetMapping("/access-token")
-    public ResponseResult getAccessToken(){
-        return dingTalkService.getAccessToken();
+    public ResponseResult<AccessTokenResponse> getAccessToken(){
+        return ResponseResult.success(dingTalkService.getAccessToken());
     }
 
     // 根据手机号获取用户信息
     @GetMapping("/user")
-    public ResponseResult getUserByMobile(
+    public ResponseResult<DingTalkUserResponse> getUserByMobile(
             @RequestParam String accessToken,
             @RequestParam String mobile) {
-        return dingTalkService.getUserByMobile(accessToken, mobile);
+        return ResponseResult.success(dingTalkService.getUserByMobile(accessToken, mobile));
     }
 
     // 创建群聊
     @PostMapping("/chat-group")
-    public ResponseResult createChatGroup(
+    public ResponseResult<DingTalkCreateChatResponse> createChatGroup(
             @RequestParam String accessToken,
             @RequestBody DingTalkCreateChatRequest request) {
-        return dingTalkService.createChatGroup(accessToken, request);
+        return ResponseResult.success(dingTalkService.createChatGroup(accessToken, request));
     }
 
     // 获取群聊信息
     @GetMapping("/chat-group/{chatId}")
-    public ResponseResult getChatGroupInfo(
+    public ResponseResult<DingTalkGetChatResponse> getChatGroupInfo(
             @RequestParam String accessToken,
             @PathVariable String chatId) {
-        return dingTalkService.getChatGroupInfo(accessToken, chatId);
+        return ResponseResult.success(dingTalkService.getChatGroupInfo(accessToken, chatId));
     }
 
     // 发送群聊卡片
+//    测试群会话id：cidRajsaeXdvetvkXvzWghXkg==
     @PostMapping("/group-card")
-    public ResponseResult initGroupCard(@RequestParam String accessToken,@RequestParam String openConversationId) {
+    public ResponseResult<CardInstanceResponse.Result> initGroupCard(@RequestParam String accessToken, @RequestParam String openConversationId) {
         GroupCardInitRequest request = new GroupCardInitRequest(openConversationId);
-        return dingTalkService.initGroupCard(accessToken, request);
+        return ResponseResult.success(dingTalkService.initGroupCard(accessToken, request));
     }
 
     // 发送私聊卡片
     @PostMapping("/private-card")
-    public ResponseResult initPrivateCard(@RequestParam String accessToken,@RequestParam String userid) {
+    public ResponseResult<CardInstanceResponse.Result> initPrivateCard(@RequestParam String accessToken,@RequestParam String userid) {
         PrivateCardInitRequest request = new PrivateCardInitRequest(userid);
-        return dingTalkService.initPrivateCard(accessToken, request);
+        return ResponseResult.success(dingTalkService.initPrivateCard(accessToken, request));
     }
 }

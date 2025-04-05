@@ -2,9 +2,15 @@ package com.ncf.apollodemo.controller;
 
 import com.ctrip.framework.apollo.openapi.dto.*;
 import com.ncf.apollodemo.config.ApolloClientRegistrar;
+import com.ncf.apollodemo.manager.service.DingTalkService;
 import com.ncf.apollodemo.pojo.domain.AddXxlJob;
 
 import com.ncf.apollodemo.pojo.dto.PageQueryDTO;
+import com.ncf.apollodemo.pojo.dto.SendCardDTO;
+import com.ncf.apollodemo.pojo.model.request.initcard.PrivateCardInitRequest;
+import com.ncf.apollodemo.pojo.model.response.AccessTokenResponse;
+import com.ncf.apollodemo.pojo.model.response.CardInstanceResponse;
+import com.ncf.apollodemo.pojo.model.response.DingTalkUserResponse;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.manager.service.ApolloService;
 import com.ncf.apollodemo.manager.service.impl.TokenService;
@@ -41,7 +47,8 @@ public class ApolloController {
     private ApolloClientRegistrar beanRegistrar;
     @Autowired
     private TokenService tokenService;
-
+    @Autowired
+    private DingTalkService dingTalkService;
     /**
      * 得到某个appID某个环境下所有配置
      *
@@ -275,6 +282,25 @@ public class ApolloController {
         try{
             Integer i = apolloService.setTask(addXxlJob,env,appId);
             return ResponseResult.success(i);
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+    }
+
+    @PostMapping("/{env}/{appId}/sendCard")
+    public ResponseResult<String> sendCard(@PathVariable String env, @PathVariable String appId, @RequestBody SendCardDTO sendCardDTO) {
+        logger.info("sendCard sendCardDTO:{}", sendCardDTO);
+        try{
+//            发送卡片，监听卡片结果
+            AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
+            String accessToken = accessTokenData.getAccessToken();
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入，这边暂时写死
+            DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, sendCardDTO.getPhone());
+            String userid = idData.getResult().getUserid();
+            PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,sendCardDTO);
+            CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+            return ResponseResult.success(result.getOutTrackId());
         }catch (Exception e){
             logger.error(e.getMessage());
             return ResponseResult.error(500, e.getMessage());

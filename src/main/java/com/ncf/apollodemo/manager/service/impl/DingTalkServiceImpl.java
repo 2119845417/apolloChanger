@@ -1,6 +1,6 @@
-package com.ncf.apollodemo.dingtalkservice.impl;
+package com.ncf.apollodemo.manager.service.impl;
 
-import com.ncf.apollodemo.dingtalkservice.DingTalkService;
+import com.ncf.apollodemo.manager.service.DingTalkService;
 import com.ncf.apollodemo.feign.DingTalkClient;
 import com.ncf.apollodemo.feign.InitCardInstanceClient;
 import com.ncf.apollodemo.pojo.model.request.DingTalkCreateChatRequest;
@@ -36,19 +36,19 @@ public class DingTalkServiceImpl implements DingTalkService {
 
 
     @Override
-    public ResponseResult getAccessToken() {
+    public AccessTokenResponse getAccessToken() {
         AccessTokenResponse accessTokenObj = dingTalkClient.getAccessToken(APPKEY, APPSECRET);
-        return ResponseResult.success(accessTokenObj);
+        return accessTokenObj;
     }
 
     @Override
-    public ResponseResult getUserByMobile(String accessToken, String mobile) {
+    public DingTalkUserResponse getUserByMobile(String accessToken, String mobile) {
         DingTalkUserResponse userByMobile = dingTalkClient.getUserByMobile(accessToken, mobile);
-        return ResponseResult.success(userByMobile.getResult());
+        return userByMobile;
     }
 
     @Override
-    public ResponseResult createChatGroup(String accessToken, DingTalkCreateChatRequest request) {
+    public DingTalkCreateChatResponse createChatGroup(String accessToken, DingTalkCreateChatRequest request) {
         //TODO
         /**
          * 对request做出个性化，要注意一下几点：
@@ -63,7 +63,7 @@ public class DingTalkServiceImpl implements DingTalkService {
          * chatBannedType: 是否开启群禁言：是否开启群禁言。0（默认）：不禁言，1：全员禁言。
          */
         DingTalkCreateChatResponse chatGroupInfo = dingTalkClient.createChatGroup(accessToken, request);
-        return ResponseResult.success(chatGroupInfo);
+        return chatGroupInfo;
         /**
          * 注意：
          * 返回中拿到的"chatid"与"openConversationId"非常重要
@@ -72,13 +72,13 @@ public class DingTalkServiceImpl implements DingTalkService {
     }
 
     @Override
-    public ResponseResult getChatGroupInfo(String accessToken, String chatId) {
+    public DingTalkGetChatResponse getChatGroupInfo(String accessToken, String chatId) {
         DingTalkGetChatResponse chatGroupInfo = dingTalkClient.getChatGroupInfo(accessToken, chatId);
-        return ResponseResult.success(chatGroupInfo.getChatInfo());
+        return chatGroupInfo;
     }
 
     @Override
-    public ResponseResult initGroupCard(String accessToken, GroupCardInitRequest request) {
+    public CardInstanceResponse.Result initGroupCard(String accessToken, GroupCardInitRequest request) {
         // 填充静态数据
         request.setCardTemplateId(CARDTEMPLATEID);//模板id
         request.setCallbackType(CALLBACKTYPE);//卡片回调类型
@@ -104,13 +104,14 @@ public class DingTalkServiceImpl implements DingTalkService {
 
 
         CardInstanceResponse cardInstanceResponse = initCardInstanceClient.initGroupCard(accessToken, request);
-        return ResponseResult.success(cardInstanceResponse.getResult());
+        return cardInstanceResponse.getResult();
     }
 
+//    向项目负责人发送增加或更新配置卡片审批
     @Override
-    public ResponseResult initPrivateCard(String accessToken, PrivateCardInitRequest request) {
+    public CardInstanceResponse.Result initPrivateCard(String accessToken, PrivateCardInitRequest request) {
         // 填充静态数据
-        request.setCardTemplateId("3b052083-d23e-493c-bbd5-f000a46fe668.schema");
+        request.setCardTemplateId(CARDTEMPLATEID);
         request.setCallbackType(CALLBACKTYPE);
 
 
@@ -120,18 +121,25 @@ public class DingTalkServiceImpl implements DingTalkService {
         // 填充 cardData
         PrivateCardInitRequest.CardData cardData = new PrivateCardInitRequest.CardData();
         PrivateCardInitRequest.CardParamMap cardParamMap = new PrivateCardInitRequest.CardParamMap();
+
         cardParamMap.setCreateTime(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
-        cardParamMap.setTitle("私发测试提交的申请标题Title");
-        cardParamMap.setType("私发测试Type");
-        cardParamMap.setReason("私发测试Reason");
-        cardParamMap.setLastMessage("私发测试LastMessage");
+        cardParamMap.setTitle("由" + request.getSendCardDTO().getOpsUser() + "提出的配置变更申请");
+        cardParamMap.setType("配置变更");
+        cardParamMap.setReason(request.getSendCardDTO().getReason());
+        cardParamMap.setAppid(request.getAppId());
+        cardParamMap.setKey(request.getSendCardDTO().getOpenItemDTO().getKey());
+        cardParamMap.setValue(request.getSendCardDTO().getOpenItemDTO().getValue());
+        Integer type = request.getSendCardDTO().getOpenItemDTO().getType();
+        cardParamMap.setItemType(type.toString());
+        cardParamMap.setComment(request.getSendCardDTO().getOpenItemDTO().getComment());
+        cardParamMap.setLastMessage("");
         cardParamMap.setStatus("");
         cardData.setCardParamMap(cardParamMap);
         request.setCardData(cardData);
 
 
         CardInstanceResponse cardInstanceResponse = initCardInstanceClient.initPrivateCard(accessToken, request);
-        return ResponseResult.success(cardInstanceResponse.getResult());
+        return cardInstanceResponse.getResult();
     }
 
 

@@ -1,8 +1,9 @@
-package com.ncf.apollodemo.dingtalkservice;
+package com.ncf.apollodemo.manager.service;
 
 import com.ncf.apollodemo.pojo.model.request.DingTalkCreateChatRequest;
 import com.ncf.apollodemo.pojo.model.request.initcard.GroupCardInitRequest;
 import com.ncf.apollodemo.pojo.model.request.initcard.PrivateCardInitRequest;
+import com.ncf.apollodemo.pojo.model.response.*;
 import com.ncf.apollodemo.resp.ResponseResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +13,7 @@ public interface DingTalkService {
     /**
      * 获取企业内部应用的access_token(权限默认开通，无需申请)
      */
-    ResponseResult getAccessToken();
+    AccessTokenResponse getAccessToken();
 
     /**
      * 根据手机号查询用户（需开通根据手机号获取成员基本信息权限）
@@ -20,7 +21,7 @@ public interface DingTalkService {
      * @param mobile 手机号
      * @return
      */
-    ResponseResult getUserByMobile(String accessToken,String mobile);
+    DingTalkUserResponse getUserByMobile(String accessToken, String mobile);
 
     /**
      * 创建群（需开通钉钉群基础信息管理权限）
@@ -28,7 +29,7 @@ public interface DingTalkService {
      * @param request 创建群聊请求体（字段详情查看DingTalkCreateChatRequest类）
      * @return
      */
-    ResponseResult createChatGroup(String accessToken, DingTalkCreateChatRequest request);
+    DingTalkCreateChatResponse createChatGroup(String accessToken, DingTalkCreateChatRequest request);
     /**
      * 对createChatGroup中的request做出个性化，要注意一下几点：
      * name: 群名称：群的名称，建议包含主题或用途，便于后续管理。
@@ -48,7 +49,7 @@ public interface DingTalkService {
      * @param chatId 群会话的ID（仅支持通过调用服务端创建群接口获取的chatid参数值）
      * @return
      */
-    ResponseResult getChatGroupInfo(String accessToken, String chatId);
+    DingTalkGetChatResponse getChatGroupInfo(String accessToken, String chatId);
 
 
     /**
@@ -58,7 +59,7 @@ public interface DingTalkService {
      * @return
      */
     @PostMapping("/v1.0/card/instances/createAndDeliver")
-    ResponseResult initGroupCard(String accessToken, GroupCardInitRequest request);
+    CardInstanceResponse.Result initGroupCard(String accessToken, GroupCardInitRequest request);
 
     /**
      * 单发卡片
@@ -67,7 +68,7 @@ public interface DingTalkService {
      * @return
      */
     @PostMapping("/v1.0/card/instances/createAndDeliver")
-    ResponseResult initPrivateCard(
+    CardInstanceResponse.Result initPrivateCard(
             @RequestHeader("x-acs-dingtalk-access-token") String accessToken,
             @RequestBody PrivateCardInitRequest request
     );
