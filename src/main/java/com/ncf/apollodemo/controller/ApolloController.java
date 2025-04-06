@@ -187,6 +187,51 @@ public class ApolloController {
     }
 
     /**
+     * 向apollo中新增配置项，为未发布状态。
+     * post uri:apollo/dev/add
+     * @param env 指定apollo的数据环境
+     * @return
+     */
+    @PostMapping("/{env}/{appId}/addTestCard")
+    public ResponseResult<OpenItemDTO> addTestCard(@PathVariable String env,@PathVariable String appId,@RequestBody CreateOrUpdateDTO createOrUpdateDTO) {
+        logger.info("addParam scheduledUpdateDTO:{}", createOrUpdateDTO);
+        try{
+            if(env.equals("LOCAL")){
+                //            发送卡片，监听卡片结果
+                AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
+                String accessToken = accessTokenData.getAccessToken();
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入
+                DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, createOrUpdateDTO.getPhone());
+                String userid = idData.getResult().getUserid();
+                PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,createOrUpdateDTO);
+                CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+//            向单例共享map里保存 卡片id为key，配置变更信息为value的键值对
+                CallBackDTO callBackDTO = new CallBackDTO(appId,env,createOrUpdateDTO);
+                SingletonMap.getInstance().put(result.getOutTrackId(), callBackDTO);
+                return ResponseResult.success(createOrUpdateDTO.getOpenItemDTO());
+            }else {
+                // 获取拦截器初始化的客户端
+                ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                        .currentRequestAttributes()
+                        .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+                OpenItemDTO item = apolloService.createItem(env, createOrUpdateDTO.getOpenItemDTO(),appId,client);
+                //                设置一次性定时任务
+                if(createOrUpdateDTO.getAddXxlJob() == null){
+                    apolloService.publishNamespace(env,appId,client);
+                }else {
+                    apolloService.setTask(createOrUpdateDTO.getAddXxlJob(), env, appId);
+                }
+                return ResponseResult.success(item);
+            }
+
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+    }
+
+
+    /**
      * 修改apollo中配置项，为未发布状态。需指定发布时间
      * post uri:apollo/dev/update
      * @param env 指定apollo的数据环境
