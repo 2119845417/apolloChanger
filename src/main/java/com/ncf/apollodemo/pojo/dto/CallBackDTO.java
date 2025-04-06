@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SendCardDTO {
-    private String opsUser;
-    private OpenItemDTO openItemDTO;
-    private String phone;
-    private String reason;
+public class CallBackDTO {
+    private String appId;
+    private String env;
+    private CreateOrUpdateDTO createOrUpdateDTO;
 }

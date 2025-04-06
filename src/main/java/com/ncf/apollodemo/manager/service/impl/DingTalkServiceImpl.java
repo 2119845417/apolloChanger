@@ -123,15 +123,15 @@ public class DingTalkServiceImpl implements DingTalkService {
         PrivateCardInitRequest.CardParamMap cardParamMap = new PrivateCardInitRequest.CardParamMap();
 
         cardParamMap.setCreateTime(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
-        cardParamMap.setTitle("由" + request.getSendCardDTO().getOpsUser() + "提出的配置变更申请");
+        cardParamMap.setTitle("由" + request.getCreateOrUpdateDTO().getOpsUser() + "提出的配置变更申请");
         cardParamMap.setType("配置变更");
-        cardParamMap.setReason(request.getSendCardDTO().getReason());
+        cardParamMap.setReason(request.getCreateOrUpdateDTO().getReason());
         cardParamMap.setAppid(request.getAppId());
-        cardParamMap.setKey(request.getSendCardDTO().getOpenItemDTO().getKey());
-        cardParamMap.setValue(request.getSendCardDTO().getOpenItemDTO().getValue());
-        Integer type = request.getSendCardDTO().getOpenItemDTO().getType();
+        cardParamMap.setKey(request.getCreateOrUpdateDTO().getOpenItemDTO().getKey());
+        cardParamMap.setValue(request.getCreateOrUpdateDTO().getOpenItemDTO().getValue());
+        Integer type = request.getCreateOrUpdateDTO().getOpenItemDTO().getType();
         cardParamMap.setItemType(type.toString());
-        cardParamMap.setComment(request.getSendCardDTO().getOpenItemDTO().getComment());
+        cardParamMap.setComment(request.getCreateOrUpdateDTO().getOpenItemDTO().getComment());
         cardParamMap.setLastMessage("");
         cardParamMap.setStatus("");
         cardData.setCardParamMap(cardParamMap);

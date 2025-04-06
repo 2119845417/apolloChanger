@@ -1,9 +1,14 @@
 package com.ncf.apollodemo.handler;
 
+import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
+import com.ncf.apollodemo.manager.service.ApolloService;
+import com.ncf.apollodemo.pojo.dto.CallBackDTO;
 import com.ncf.apollodemo.pojo.model.CardCallbackRequest;
 import com.ncf.apollodemo.pojo.model.CardCallbackResponse;
+import com.ncf.apollodemo.utils.SingletonMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,6 +20,8 @@ import java.util.Map;
 @Component
 public class DefaultCallbackHandler implements CustomCallbackHandler {
 
+    @Autowired
+    private ApolloService apolloService;
     private static final Logger log = LogManager.getLogger(DefaultCallbackHandler.class);
     private static final String AGREE_ACTION = "agree";
     private static final String REGECT_ACTION = "reject";
@@ -22,6 +29,8 @@ public class DefaultCallbackHandler implements CustomCallbackHandler {
     /**
      * 处理钉钉回调请求的主方法。
      * 根据回调参数执行业务逻辑，并构造响应对象。
+     *
+     * 只有更改PR或PROD环境下的配置才会走这个方法
      *
      * @param request 钉钉回调请求对象，内含卡片的唯一ID，点击按钮人的UserId关键数据
      * @param params  回调参数
@@ -39,7 +48,20 @@ public class DefaultCallbackHandler implements CustomCallbackHandler {
 
         switch (newStatus){
             case AGREE_ACTION:
+//                从本地内存中得到卡片携带的配置变更信息
+                CallBackDTO callBackDTO = SingletonMap.getInstance().get(request.getOutTrackId());
+//                初始化ApolloOpenApiClient
+                ApolloOpenApiClient client = apolloService.getClient(callBackDTO.getAppId());
+//                执行创建或更新配置，为未发布状态
+                apolloService.createOrUpdateItem(callBackDTO.getEnv(),callBackDTO.getCreateOrUpdateDTO().getOpenItemDTO(),callBackDTO.getAppId(),client);
+//                如果设置了定时发布时间则设置定时发布任务没有则立即发布
+                if(callBackDTO.getCreateOrUpdateDTO().getAddXxlJob() == null){
+                    apolloService.publishNamespace(callBackDTO.getEnv(),callBackDTO.getAppId(),client);
+                }else {
+                    apolloService.setTask(callBackDTO.getCreateOrUpdateDTO().getAddXxlJob(), callBackDTO.getEnv(),callBackDTO.getAppId());
+                }
             case REGECT_ACTION:
+//                不做处理
         }
         // 构造响应对象
         CardCallbackResponse response = new CardCallbackResponse();

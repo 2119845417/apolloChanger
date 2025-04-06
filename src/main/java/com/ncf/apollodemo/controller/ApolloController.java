@@ -5,15 +5,17 @@ import com.ncf.apollodemo.config.ApolloClientRegistrar;
 import com.ncf.apollodemo.manager.service.DingTalkService;
 import com.ncf.apollodemo.pojo.domain.AddXxlJob;
 
+import com.ncf.apollodemo.pojo.dto.CallBackDTO;
+import com.ncf.apollodemo.pojo.dto.CreateOrUpdateDTO;
 import com.ncf.apollodemo.pojo.dto.PageQueryDTO;
-import com.ncf.apollodemo.pojo.dto.SendCardDTO;
 import com.ncf.apollodemo.pojo.model.request.initcard.PrivateCardInitRequest;
 import com.ncf.apollodemo.pojo.model.response.AccessTokenResponse;
 import com.ncf.apollodemo.pojo.model.response.CardInstanceResponse;
 import com.ncf.apollodemo.pojo.model.response.DingTalkUserResponse;
 import com.ncf.apollodemo.resp.ResponseResult;
 import com.ncf.apollodemo.manager.service.ApolloService;
-import com.ncf.apollodemo.manager.service.impl.TokenService;
+import com.ncf.apollodemo.manager.service.TokenService;
+import com.ncf.apollodemo.utils.SingletonMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
 //@Profile({"dev","test"}) //内部环境使用
 public class ApolloController {
     private static final Logger logger = LoggerFactory.getLogger(ApolloController.class);
+
     @Autowired
     private ApplicationContext context;
     @Autowired
@@ -49,6 +52,8 @@ public class ApolloController {
     private TokenService tokenService;
     @Autowired
     private DingTalkService dingTalkService;
+
+
     /**
      * 得到某个appID某个环境下所有配置
      *
@@ -115,11 +120,6 @@ public class ApolloController {
         return ResponseResult.success(client);
     }
 
-    @RequestMapping("/hello")
-    @ResponseBody
-    public String hello(@RequestParam(name = "name", defaultValue = "unknown user") String name) {
-        return "Hello " + name;
-    }
     /**
      * 获取环境列表，如
      * [{"clusters":["huawei","default"],"env":"PRO"},{"clusters":["default"],"env":"DEV"}]
@@ -149,17 +149,37 @@ public class ApolloController {
      * @return
      */
     @PostMapping("/{env}/{appId}/add")
-    public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@PathVariable String appId,@RequestBody OpenItemDTO openItemDTO) {
-        logger.info("addParam openItemDTO:{}", openItemDTO);
+    public ResponseResult<OpenItemDTO> addParam(@PathVariable String env,@PathVariable String appId,@RequestBody CreateOrUpdateDTO createOrUpdateDTO) {
+        logger.info("addParam scheduledUpdateDTO:{}", createOrUpdateDTO);
         try{
-            // 获取拦截器初始化的客户端
-            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
-                    .currentRequestAttributes()
-                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
-            OpenItemDTO item = apolloService.createItem(env, openItemDTO,appId,client);
-//            openItemDTO.setDataChangeCreatedBy(opUser);
-//            OpenItemDTO item = apolloClient.createItem(appId, env, cluster, namespace, openItemDTO);
-            return ResponseResult.success(item);
+            if(env.equals("PR") || env.equals("PROD")){
+            //            发送卡片，监听卡片结果
+            AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
+            String accessToken = accessTokenData.getAccessToken();
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入
+            DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, createOrUpdateDTO.getPhone());
+            String userid = idData.getResult().getUserid();
+            PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,createOrUpdateDTO);
+            CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+//            向单例共享map里保存 卡片id为key，配置变更信息为value的键值对
+                CallBackDTO callBackDTO = new CallBackDTO(appId,env,createOrUpdateDTO);
+                SingletonMap.getInstance().put(result.getOutTrackId(), callBackDTO);
+            return ResponseResult.success(createOrUpdateDTO.getOpenItemDTO());
+        }else {
+                // 获取拦截器初始化的客户端
+                ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                        .currentRequestAttributes()
+                        .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+                OpenItemDTO item = apolloService.createItem(env, createOrUpdateDTO.getOpenItemDTO(),appId,client);
+                //                设置一次性定时任务
+                if(createOrUpdateDTO.getAddXxlJob() == null){
+                    apolloService.publishNamespace(env,appId,client);
+                }else {
+                    apolloService.setTask(createOrUpdateDTO.getAddXxlJob(), env, appId);
+                }
+                return ResponseResult.success(item);
+            }
+
         }catch(Exception e){
             logger.error(e.getMessage());
             return ResponseResult.error(500, e.getMessage());
@@ -167,21 +187,41 @@ public class ApolloController {
     }
 
     /**
-     * 修改apollo中配置项，为未发布状态。
+     * 修改apollo中配置项，为未发布状态。需指定发布时间
      * post uri:apollo/dev/update
      * @param env 指定apollo的数据环境
      * @return
      */
     @PostMapping("/{env}/{appId}/update")
-    public ResponseResult<Boolean> updateParam(@PathVariable String env,@RequestBody OpenItemDTO openItemDTO,@PathVariable String appId) {
-        logger.info("updateParam openItemDTO:{}", openItemDTO);
+    public ResponseResult<Boolean> update(@PathVariable String env, @PathVariable String appId, @RequestBody CreateOrUpdateDTO createOrUpdateDTO) {
+        logger.info("updateParam createOrUpdateDTO:{}", createOrUpdateDTO);
         try{
-            ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
-                    .currentRequestAttributes()
-                    .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
-            apolloService.createOrUpdateItem(env, openItemDTO,appId,client);
-//            openItemDTO.setDataChangeCreatedBy(opUser);
-//            apolloClient.createOrUpdateItem(appId, env, cluster, namespace, openItemDTO);
+            if(env.equals("PR") || env.equals("PROD")){
+                //            发送卡片，监听卡片结果
+                AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
+                String accessToken = accessTokenData.getAccessToken();
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入
+                DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, createOrUpdateDTO.getPhone());
+                String userid = idData.getResult().getUserid();
+                PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,createOrUpdateDTO);
+                CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+//            向单例共享map里保存 卡片id为key，配置变更信息为value的键值对
+                CallBackDTO callBackDTO = new CallBackDTO(appId,env,createOrUpdateDTO);
+                SingletonMap.getInstance().put(result.getOutTrackId(), callBackDTO);
+                return ResponseResult.success(true);
+            }else {
+                ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                        .currentRequestAttributes()
+                        .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+                apolloService.createOrUpdateItem(env, createOrUpdateDTO.getOpenItemDTO(),appId,client);
+//                设置一次性定时任务
+                if(createOrUpdateDTO.getAddXxlJob() == null){
+                    apolloService.publishNamespace(env,appId,client);
+                }else {
+//                    定时发布
+                    apolloService.setTask(createOrUpdateDTO.getAddXxlJob(), env, appId);
+                }
+            }
             return ResponseResult.success(true);
         }catch(Exception e){
             logger.error(e.getMessage());
@@ -289,17 +329,20 @@ public class ApolloController {
     }
 
     @PostMapping("/{env}/{appId}/sendCard")
-    public ResponseResult<String> sendCard(@PathVariable String env, @PathVariable String appId, @RequestBody SendCardDTO sendCardDTO) {
-        logger.info("sendCard sendCardDTO:{}", sendCardDTO);
+    public ResponseResult<String> sendCard(@PathVariable String env, @PathVariable String appId, @RequestBody CreateOrUpdateDTO createOrUpdateDTO) {
+        logger.info("sendCard createOrUpdateDTO:{}", createOrUpdateDTO);
         try{
 //            发送卡片，监听卡片结果
             AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
             String accessToken = accessTokenData.getAccessToken();
-//            正确做法是根据appid找到对应负责人，然后去user.phone传入，这边暂时写死
-            DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, sendCardDTO.getPhone());
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入
+            DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, createOrUpdateDTO.getPhone());
             String userid = idData.getResult().getUserid();
-            PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,sendCardDTO);
+            PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,createOrUpdateDTO);
             CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+//            向单例共享map里保存 卡片id为key，配置变更信息为value的键值对
+            CallBackDTO callBackDTO = new CallBackDTO(appId,env, createOrUpdateDTO);
+            SingletonMap.getInstance().put(result.getOutTrackId(), callBackDTO);
             return ResponseResult.success(result.getOutTrackId());
         }catch (Exception e){
             logger.error(e.getMessage());
