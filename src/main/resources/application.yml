@@ -18,10 +18,3 @@ xxl:
     enabled: false  # 关闭 XXL-JOB 初始化
     admin:
       addresses: http://127.0.0.1:9080/xxl-job-admin
-
-
-
-
-
-
-
