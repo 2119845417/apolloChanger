@@ -108,8 +108,8 @@ public class ApolloController {
     }
 
 
-    @PostMapping("/getClient")
-    public ResponseResult<ApolloOpenApiClient> getClient(@RequestParam String appId) {
+    @PostMapping("/{env}/{appId}/getClient")
+    public ResponseResult<ApolloOpenApiClient> getClient(@PathVariable String appId) {
         // 检查Bean是否已存在
         String beanName = "apolloClient_" + appId;
         if (!context.containsBean(beanName)) {
@@ -187,7 +187,7 @@ public class ApolloController {
     }
 
     /**
-     * 向apollo中新增配置项，为未发布状态。
+     * 向apollo中新增配置项，为未发布状态。测试LOCAL发送卡片回调
      * post uri:apollo/dev/add
      * @param env 指定apollo的数据环境
      * @return
@@ -242,6 +242,49 @@ public class ApolloController {
         logger.info("updateParam createOrUpdateDTO:{}", createOrUpdateDTO);
         try{
             if(env.equals("PR") || env.equals("PROD")){
+                //            发送卡片，监听卡片结果
+                AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
+                String accessToken = accessTokenData.getAccessToken();
+//            正确做法是根据appid找到对应负责人，然后去user.phone传入
+                DingTalkUserResponse idData = dingTalkService.getUserByMobile(accessToken, createOrUpdateDTO.getPhone());
+                String userid = idData.getResult().getUserid();
+                PrivateCardInitRequest request = new PrivateCardInitRequest(userid,appId,createOrUpdateDTO);
+                CardInstanceResponse.Result result = dingTalkService.initPrivateCard(accessToken, request);
+//            向单例共享map里保存 卡片id为key，配置变更信息为value的键值对
+                CallBackDTO callBackDTO = new CallBackDTO(appId,env,createOrUpdateDTO);
+                SingletonMap.getInstance().put(result.getOutTrackId(), callBackDTO);
+                return ResponseResult.success(true);
+            }else {
+                ApolloOpenApiClient client = (ApolloOpenApiClient) RequestContextHolder
+                        .currentRequestAttributes()
+                        .getAttribute("apolloClient", RequestAttributes.SCOPE_REQUEST);
+                apolloService.createOrUpdateItem(env, createOrUpdateDTO.getOpenItemDTO(),appId,client);
+//                设置一次性定时任务
+                if(createOrUpdateDTO.getAddXxlJob() == null){
+                    apolloService.publishNamespace(env,appId,client);
+                }else {
+//                    定时发布
+                    apolloService.setTask(createOrUpdateDTO.getAddXxlJob(), env, appId);
+                }
+            }
+            return ResponseResult.success(true);
+        }catch(Exception e){
+            logger.error(e.getMessage());
+            return ResponseResult.error(500, e.getMessage());
+        }
+    }
+
+    /**
+     * 修改apollo中配置项，为未发布状态。需指定发布时间 测试LOCAL发送卡片回调
+     * post uri:apollo/dev/update
+     * @param env 指定apollo的数据环境
+     * @return
+     */
+    @PostMapping("/{env}/{appId}/updateTestCard")
+    public ResponseResult<Boolean> updateTestCard(@PathVariable String env, @PathVariable String appId, @RequestBody CreateOrUpdateDTO createOrUpdateDTO) {
+        logger.info("updateParam createOrUpdateDTO:{}", createOrUpdateDTO);
+        try{
+            if(env.equals("LOCAL")){
                 //            发送卡片，监听卡片结果
                 AccessTokenResponse accessTokenData = dingTalkService.getAccessToken();
                 String accessToken = accessTokenData.getAccessToken();
