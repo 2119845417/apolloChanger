@@ -16,38 +16,42 @@ apollo:
 #配置日志
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: ${mybatis-plus.configuration.log-impl}
 #    org.apache.ibatis.logging.stdout.StdOutImpl
 
 management:
   health:
     xxljob:
-      enabled: false
+      enabled: ${management.health.xxljob.enabled}
 
 appkey:
   apollo:
     appId: 101
+#    ${appkey.apollo.appId}
 #    101
     opUser: admin-ncf
+#    ${appkey.apollo.opUser}
 #    admin-ncf
     cluster: default
+#    ${appkey.apollo.cluster}
 #    default
     namespace: application
+#    ${appkey.apollo.namespace}
 #    application
 
 spring:
   datasource:
-    url: jdbc:mysql://rm-cn-lf646m6e4001lgo.rwlb.rds.aliyuncs.com:3306/apollochanger?useSSL=true&serverTimezone=Asia/Shanghai
+    url: ${spring.datasource.url}
     #    jdbc:mysql://rm-cn-lf646m6e4001lgo.rwlb.rds.aliyuncs.com:3306/apollochanger?useSSL=true&serverTimezone=Asia/Shanghai
-    username: apollochanger
+    username: ${spring.datasource.username}
 #    apollochanger
-    password: Nn076076!
+    password: ${spring.datasource.password}
 #    Nn076076!
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: ${spring.datasource.driver-class-name}
 #    com.mysql.cj.jdbc.Driver
   mvc:
     pathmatch:
-      matching-strategy: ant_path_matcher
+      matching-strategy: ${spring.mvc.pathmatch.matching-strategy}
 #      ant_path_matcher
 xxl:
   job:
@@ -83,10 +87,19 @@ xxl:
 
 dingtalk:
   appKey: "dingrzt0dsutkgggladp"
+#  ${dingtalk.appKey}
   appSecret: "9CD8LNQbFm_RgZeFNPeeysf1LjlqeVcvKrZqvcklU2cPgUr7l7Db71HivF7hlDwH"
+#    ${dingtalk.appSecret}
+#  "9CD8LNQbFm_RgZeFNPeeysf1LjlqeVcvKrZqvcklU2cPgUr7l7Db71HivF7hlDwH"
   cardTemplateId: "0b7a7782-fd54-4d61-b33a-43524accbdf2.schema"
+#    ${dingtalk.cardTemplateId}
+#  "0b7a7782-fd54-4d61-b33a-43524accbdf2.schema"
   callbackType: "STREAM"
+#  ${dingtalk.callbackType}
+#  "STREAM"
   robotCode: "dingrzt0dsutkgggladp"
+#    ${dingtalk.robotCode}
+#  "dingrzt0dsutkgggladp"
 
 
 
