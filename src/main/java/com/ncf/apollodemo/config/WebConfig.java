@@ -18,6 +18,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(apolloClientInterceptor)
             .addPathPatterns("/apollo/**")
             .excludePathPatterns("/error") // 排除Spring Boot错误端点
-            .order(0); // 设置为最高优先级
+            .order(1); // 设置为最高优先级
     }
 }

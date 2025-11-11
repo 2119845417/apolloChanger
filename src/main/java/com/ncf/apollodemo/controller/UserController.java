@@ -16,6 +16,7 @@
 
 package com.ncf.apollodemo.controller;
 
+import com.ncf.apollodemo.annotation.AllowAnon;
 import com.ncf.apollodemo.pojo.domain.User;
 import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
 import com.ncf.apollodemo.pojo.dto.UserEditInfoDTO;
@@ -42,6 +43,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @AllowAnon
     @PostMapping("/login")
     public ResponseResult<String> userLogin(@RequestBody UserLoginDTO userLoginDTO) {
         logger.info("登陆{}", userLoginDTO);

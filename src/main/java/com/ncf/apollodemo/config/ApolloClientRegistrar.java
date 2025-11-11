@@ -8,8 +8,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -38,7 +36,7 @@ public class ApolloClientRegistrar  implements BeanDefinitionRegistryPostProcess
                     .genericBeanDefinition(ApolloOpenApiClient.class)
                     .addConstructorArgValue("http://localhost:8070/")
                     .addConstructorArgValue(token)
-                    .addConstructorArgValue(config) // 明确指定第三个参数
+                    .addConstructorArgValue(config)
                     .setScope(BeanDefinition.SCOPE_SINGLETON)
                     .getBeanDefinition();
             registry.registerBeanDefinition(beanName, definition);

@@ -4,19 +4,38 @@ import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncf.apollodemo.annotation.AllowAnon;
 import com.ncf.apollodemo.utils.JWTUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class JWTInterceptor implements HandlerInterceptor {
+    // 依赖可正常注入
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Map<String, Object> map = new HashMap<>();
+        HandlerMethod handlerMethod = (HandlerMethod) handler;
+        Method method = handlerMethod.getMethod();
+        //检查有没有允许匿名访问的注解
+        if (method.isAnnotationPresent(AllowAnon.class)) {
+
+            AllowAnon allowAnon = method.getAnnotation(AllowAnon.class);
+            if (allowAnon.required()) {
+
+                //允许匿名访问（无需权限）
+                return true;
+            }
+        }
         //获取请求头中令牌
         String token = request.getHeader("token");
         try {
